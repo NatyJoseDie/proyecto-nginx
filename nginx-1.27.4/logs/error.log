@@ -1,0 +1,4 @@
+2025/03/24 12:21:07 [error] 5864#780: *1 CreateFile() "C:\Users\Natalia\OneDrive\Escritorio\proyecto-nginx\nginx-1.27.4/html/favicon.ico" failed (2: The system cannot find the file specified), client: 127.0.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "http://localhost/"
+2025/03/24 17:17:17 [notice] 376#17836: signal process started
+2025/03/24 17:19:37 [notice] 20664#24368: signal process started
+2025/03/24 17:19:37 [error] 20664#24368: CreateFile() "C:\Users\Natalia\OneDrive\Escritorio\proyecto-nginx\nginx-1.27.4/logs/nginx.pid" failed (2: The system cannot find the file specified)
