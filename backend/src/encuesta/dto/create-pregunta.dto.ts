@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsNumber, IsEnum, IsArray, IsOptional, IsUrl } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsEnum,
+  IsArray,
+  IsOptional,
+  IsUrl,
+} from 'class-validator';
 import { TipoRespuesta } from '../../enums/tipo-respuesta.enum';
 
 import { Type } from 'class-transformer';

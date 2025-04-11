@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { Encuesta } from './encuesta.entity';
 import { RespuestaAbierta } from './respuesta-abierta.entity';
 import { RespuestaOpcion } from './respuesta-opcion.entity';
@@ -11,13 +17,23 @@ export class Respuesta {
   @Column({ type: 'uuid', default: () => 'uuid_generate_v4()', unique: true })
   codigoAcceso: string;
 
-  @ManyToOne(() => Encuesta, encuesta => encuesta.respuestas, { nullable: false })
+  @ManyToOne(() => Encuesta, (encuesta) => encuesta.respuestas, {
+    nullable: false,
+  })
   encuesta: Encuesta;
 
-  @OneToMany(() => RespuestaAbierta, respuestaAbierta => respuestaAbierta.respuesta, { onDelete: 'CASCADE' })
+  @OneToMany(
+    () => RespuestaAbierta,
+    (respuestaAbierta) => respuestaAbierta.respuesta,
+    { onDelete: 'CASCADE' },
+  )
   respuestasAbiertas: RespuestaAbierta[];
 
-  @OneToMany(() => RespuestaOpcion, respuestaOpcion => respuestaOpcion.respuesta, { onDelete: 'CASCADE' })
+  @OneToMany(
+    () => RespuestaOpcion,
+    (respuestaOpcion) => respuestaOpcion.respuesta,
+    { onDelete: 'CASCADE' },
+  )
   respuestasOpciones: RespuestaOpcion[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

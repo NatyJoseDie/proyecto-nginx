@@ -2,7 +2,6 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Opcion } from './opcion.entity';
 import { Respuesta } from './respuesta.entity';
 
-
 @Entity('respuestas_opciones')
 export class RespuestaOpcion {
   @PrimaryGeneratedColumn()
