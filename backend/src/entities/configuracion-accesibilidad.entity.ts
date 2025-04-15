@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Encuesta } from './encuesta.entity';
 
 @Entity('configuracion_accesibilidad')
@@ -37,7 +43,7 @@ export class ConfiguracionAccesibilidad {
   @Column({ type: 'varchar', nullable: true })
   idiomaPreferido: string;
 
-  @OneToOne(() => Encuesta, encuesta => encuesta.configuracionAccesibilidad)
+  @OneToOne(() => Encuesta, (encuesta) => encuesta.configuracionAccesibilidad)
   @JoinColumn()
   encuesta: Encuesta;
 }

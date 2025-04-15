@@ -17,7 +17,7 @@ export class EncuestaService {
       id: this.encuestas.length + 1,
       ...createEncuestaDto,
       codigoRespuesta: Math.random().toString(36).substring(7),
-      codigoResultados: Math.random().toString(36).substring(7)
+      codigoResultados: Math.random().toString(36).substring(7),
     };
     this.encuestas.push(nuevaEncuesta);
     return nuevaEncuesta;

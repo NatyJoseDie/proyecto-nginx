@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { Pregunta } from './pregunta.entity';
 import { ConfiguracionAccesibilidad } from './configuracion-accesibilidad.entity';
 import { Respuesta } from './respuesta.entity';
@@ -17,12 +23,16 @@ export class Encuesta {
   @Column({ name: 'codigo_resultados', type: 'varchar', nullable: false })
   codigoResultados: string;
 
-  @OneToMany(() => Pregunta, pregunta => pregunta.encuesta, { cascade: true })
+  @OneToMany(() => Pregunta, (pregunta) => pregunta.encuesta, { cascade: true })
   preguntas: Pregunta[];
 
-  @OneToMany(() => Respuesta, respuesta => respuesta.encuesta, { cascade: true })
+  @OneToMany(() => Respuesta, (respuesta) => respuesta.encuesta, {
+    cascade: true,
+  })
   respuestas: Respuesta[];
 
-  @OneToOne(() => ConfiguracionAccesibilidad, config => config.encuesta, { cascade: true })
+  @OneToOne(() => ConfiguracionAccesibilidad, (config) => config.encuesta, {
+    cascade: true,
+  })
   configuracionAccesibilidad: ConfiguracionAccesibilidad;
 }

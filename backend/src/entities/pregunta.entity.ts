@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { Encuesta } from './encuesta.entity';
 import { Opcion } from './opcion.entity';
 import { RespuestaAbierta } from './respuesta-abierta.entity';
@@ -37,19 +43,19 @@ export class Pregunta {
 
   // Recursos Adicionales
   @Column({ type: 'varchar', nullable: true })
-  urlAudio: string;  // Audio de la pregunta
+  urlAudio: string; // Audio de la pregunta
 
   @Column({ type: 'varchar', nullable: true })
-  descripcionAudio: string;  // Descripción del contenido del audio
+  descripcionAudio: string; // Descripción del contenido del audio
 
   @Column({ type: 'varchar', nullable: true })
-  audioInstrucciones: string;  // Instrucciones en audio
+  audioInstrucciones: string; // Instrucciones en audio
 
   @Column({ type: 'boolean', default: true })
-  permitirRespuestaVoz: boolean;  // Permitir responder por voz
+  permitirRespuestaVoz: boolean; // Permitir responder por voz
 
   @Column({ type: 'varchar', nullable: true })
-  audioAyuda: string;  // Audio con ayuda adicional
+  audioAyuda: string; // Audio con ayuda adicional
 
   @Column({ type: 'varchar', nullable: true })
   urlRecursosAdicionales: string;
@@ -72,19 +78,23 @@ export class Pregunta {
   ejemplosVisuales: string;
 
   // Campos Originales
-  @Column({ 
-    type: 'enum', 
-    enum: TipoRespuesta, 
-    default: TipoRespuesta.ABIERTA 
+  @Column({
+    type: 'enum',
+    enum: TipoRespuesta,
+    default: TipoRespuesta.ABIERTA,
   })
   tipoRespuesta: TipoRespuesta;
 
-  @ManyToOne(() => Encuesta, encuesta => encuesta.preguntas)
+  @ManyToOne(() => Encuesta, (encuesta) => encuesta.preguntas)
   encuesta: Encuesta;
 
-  @OneToMany(() => RespuestaAbierta, respuestaAbierta => respuestaAbierta.pregunta, { cascade: true })
+  @OneToMany(
+    () => RespuestaAbierta,
+    (respuestaAbierta) => respuestaAbierta.pregunta,
+    { cascade: true },
+  )
   respuestasAbiertas: RespuestaAbierta[];
 
-  @OneToMany(() => Opcion, opcion => opcion.pregunta, { cascade: true })
+  @OneToMany(() => Opcion, (opcion) => opcion.pregunta, { cascade: true })
   opciones: Opcion[];
 }

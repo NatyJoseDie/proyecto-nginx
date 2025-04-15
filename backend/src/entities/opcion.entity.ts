@@ -1,6 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { Pregunta } from './pregunta.entity';
-import { RespuestaOpcion } from './respuesta-opcion.entity';  // Changed from interface to entity
+import { RespuestaOpcion } from './respuesta-opcion.entity'; // Changed from interface to entity
 
 @Entity('opciones')
 export class Opcion {
