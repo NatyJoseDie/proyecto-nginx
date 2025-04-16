@@ -31,6 +31,8 @@ import { ConfiguracionAccesibilidad } from './entities/configuracion-accesibilid
       synchronize: true,
       logging: true,
     }),
+    
+    TypeOrmModule.forFeature([Encuesta]),
   ],
   controllers: [EncuestaController],
   providers: [EncuestaService],

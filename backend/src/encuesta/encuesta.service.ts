@@ -1,29 +1,27 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Encuesta } from '../entities/encuesta.entity';
 import { CreateEncuestaDto } from './dto/create-encuesta.dto';
-
-export interface Encuesta {
-  id: number;
-  nombre: string;
-  codigoRespuesta: string;
-  codigoResultados: string;
-}
 
 @Injectable()
 export class EncuestaService {
-  private encuestas: Encuesta[] = [];
+  constructor(
+    @InjectRepository(Encuesta)
+    private readonly encuestaRepo: Repository<Encuesta>,
+  ) {}
 
-  create(createEncuestaDto: CreateEncuestaDto) {
-    const nuevaEncuesta: Encuesta = {
-      id: this.encuestas.length + 1,
+  async create(createEncuestaDto: CreateEncuestaDto): Promise<Encuesta> {
+    const nuevaEncuesta = this.encuestaRepo.create({
       ...createEncuestaDto,
       codigoRespuesta: Math.random().toString(36).substring(7),
       codigoResultados: Math.random().toString(36).substring(7),
-    };
-    this.encuestas.push(nuevaEncuesta);
-    return nuevaEncuesta;
+    });
+
+    return await this.encuestaRepo.save(nuevaEncuesta);
   }
 
-  findAll(): Encuesta[] {
-    return this.encuestas;
+  findAll(): Promise<Encuesta[]> {
+    return this.encuestaRepo.find();
   }
 }
