@@ -17,7 +17,7 @@ import { ConfiguracionAccesibilidad } from './entities/configuracion-accesibilid
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: '31553487',
+      password: 'root',
       database: 'encuesta_web',
       entities: [
         Encuesta,
