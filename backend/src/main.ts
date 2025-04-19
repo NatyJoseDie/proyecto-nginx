@@ -1,13 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common'; // ✅ IMPORTANTE
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
+  // Habilitar CORS
+  app.enableCors({
+    origin: 'http://localhost:4200', // URL de tu frontend Angular
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
-  // ✅ Agregá esta línea para activar la validación de DTOs
-  app.useGlobalPipes(new ValidationPipe());
-
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(3000);
 }
 bootstrap();
