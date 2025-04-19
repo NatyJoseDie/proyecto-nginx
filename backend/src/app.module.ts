@@ -35,7 +35,7 @@ import { OpcionRespuestaModule } from './respuesta/opcion-respuesta/opcion-respu
       logging: true,
     }),
     
-    TypeOrmModule.forFeature([Encuesta, Pregunta]), // Added Pregunta
+    TypeOrmModule.forFeature([Encuesta, Pregunta,Respuesta]), // Added Pregunta
     PreguntaModule,
     RespuestaModule,  // Añade esta línea
     OpcionRespuestaModule,
