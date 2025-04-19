@@ -14,7 +14,7 @@ export class Respuesta {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'uuid', default: () => 'uuid_generate_v4()', unique: true })
+  @Column()
   codigoAcceso: string;
 
   @ManyToOne(() => Encuesta, (encuesta) => encuesta.respuestas, {
