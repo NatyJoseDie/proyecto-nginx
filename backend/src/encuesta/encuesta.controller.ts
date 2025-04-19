@@ -1,15 +1,9 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { EncuestaService } from './encuesta.service';
-import { CreateEncuestaDto } from './dto/create-encuesta.dto';
 
-@Controller('encuestas')
+@Controller('encuesta')
 export class EncuestaController {
   constructor(private readonly encuestaService: EncuestaService) {}
-
-  @Post()
-  create(@Body() createEncuestaDto: CreateEncuestaDto) {
-    return this.encuestaService.create(createEncuestaDto);
-  }
 
   @Get()
   findAll() {

@@ -1,24 +1,20 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Opcion } from './opcion.entity';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
 import { Respuesta } from './respuesta.entity';
+import { Opcion } from './opcion.entity';
 
 @Entity('respuestas_opciones')
 export class RespuestaOpcion {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Opcion, (opcion) => opcion.respuestasOpciones)
-  opcion: Opcion;
-
-  @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasOpciones)
+  @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasOpciones, { onDelete: 'CASCADE' })
   respuesta: Respuesta;
 
+  @ManyToOne(() => Opcion, (opcion) => opcion.respuestasOpciones, { eager: true })
+  opcion: Opcion;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  tiempoRespuesta: Date;
+  fechaRespuesta: Date;
 
-  @Column({ type: 'varchar', nullable: true })
-  metodoSeleccion: string;
-
-  @Column({ type: 'boolean', default: false })
-  requirioAsistencia: boolean;
+  // Puedes agregar más campos si lo necesitas, como usuarioId, etc.
 }

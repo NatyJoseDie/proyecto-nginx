@@ -9,6 +9,9 @@ import { Respuesta } from './entities/respuesta.entity';
 import { RespuestaOpcion } from './entities/respuesta-opcion.entity';
 import { RespuestaAbierta } from './entities/respuesta-abierta.entity';
 import { ConfiguracionAccesibilidad } from './entities/configuracion-accesibilidad.entity';
+import { PreguntaModule } from './pregunta/pregunta.module';
+import { RespuestaModule } from './respuesta/respuesta.module';
+import { OpcionRespuestaModule } from './respuesta/opcion-respuesta/opcion-respuesta.module';
 
 @Module({
   imports: [
@@ -32,7 +35,10 @@ import { ConfiguracionAccesibilidad } from './entities/configuracion-accesibilid
       logging: true,
     }),
     
-    TypeOrmModule.forFeature([Encuesta]),
+    TypeOrmModule.forFeature([Encuesta, Pregunta]), // Added Pregunta
+    PreguntaModule,
+    RespuestaModule,  // Añade esta línea
+    OpcionRespuestaModule,
   ],
   controllers: [EncuestaController],
   providers: [EncuestaService],
