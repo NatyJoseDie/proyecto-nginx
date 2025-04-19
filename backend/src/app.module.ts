@@ -12,7 +12,8 @@ import { ConfiguracionAccesibilidad } from './entities/configuracion-accesibilid
 import { PreguntaModule } from './pregunta/pregunta.module';
 import { RespuestaModule } from './respuesta/respuesta.module';
 import { OpcionRespuestaModule } from './respuesta/opcion-respuesta/opcion-respuesta.module';
-
+import * as dotenv from 'dotenv';
+dotenv.config()
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -20,7 +21,7 @@ import { OpcionRespuestaModule } from './respuesta/opcion-respuesta/opcion-respu
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: '31553487',
+      password: process.env.DB_PASSWORD || '31553487',
       database: 'encuesta_web',
       entities: [
         Encuesta,
@@ -35,6 +36,7 @@ import { OpcionRespuestaModule } from './respuesta/opcion-respuesta/opcion-respu
       logging: true,
     }),
     
+    TypeOrmModule.forFeature([Encuesta, Pregunta , Respuesta] ), // Added Pregunta
     TypeOrmModule.forFeature([Encuesta, Pregunta,Respuesta]), // Added Pregunta
     PreguntaModule,
     RespuestaModule,  // Añade esta línea
