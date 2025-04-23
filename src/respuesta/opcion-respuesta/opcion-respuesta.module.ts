@@ -9,7 +9,7 @@ import { Pregunta } from '../../entities/pregunta.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([RespuestaOpcion, Respuesta, Opcion]) // <-- Agrega aquí todas las entidades usadas en el service
+    TypeOrmModule.forFeature([RespuestaOpcion, Respuesta, Opcion]), // <-- Agrega aquí todas las entidades usadas en el service
   ],
   controllers: [OpcionRespuestaController],
   providers: [OpcionRespuestaService],

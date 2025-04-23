@@ -19,11 +19,11 @@ export class OpcionRespuestaService {
 
   async createRespuesta(dto: CreateOpcionRespuestaDto) {
     const respuesta = await this.respuestaRepo.findOne({
-      where: { id: dto.respuestaId }
+      where: { id: dto.respuestaId },
     });
 
     const opcion = await this.opcionRepo.findOne({
-      where: { id: dto.opcionId }
+      where: { id: dto.opcionId },
     });
 
     if (!respuesta || !opcion) {
@@ -33,11 +33,11 @@ export class OpcionRespuestaService {
     const respuestaOpcion = this.respuestaOpcionRepo.create({
       respuesta,
       opcion,
-      fechaRespuesta: new Date()
+      fechaRespuesta: new Date(),
     });
 
     return this.respuestaOpcionRepo.save(respuestaOpcion);
-}
+  }
 
   findAll() {
     return this.respuestaOpcionRepo.find({

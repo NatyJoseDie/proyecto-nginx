@@ -6,7 +6,8 @@ import { Pregunta } from '../../entities/pregunta.entity';
 import { CreateOpcionDto } from './dto/create-opcion.dto';
 
 @Injectable()
-export class OpcionPreguntaService {  // Cambiado de OpcionService a OpcionPreguntaService
+export class OpcionPreguntaService {
+  // Cambiado de OpcionService a OpcionPreguntaService
   constructor(
     @InjectRepository(Opcion)
     private readonly opcionRepo: Repository<Opcion>,
@@ -14,13 +15,16 @@ export class OpcionPreguntaService {  // Cambiado de OpcionService a OpcionPregu
     private readonly preguntaRepo: Repository<Pregunta>,
   ) {}
 
-  async createOpcionPregunta(dto: CreateOpcionDto): Promise<Opcion> {  // Cambiado de create a createOpcionPregunta
+  async createOpcionPregunta(dto: CreateOpcionDto): Promise<Opcion> {
+    // Cambiado de create a createOpcionPregunta
     const pregunta = await this.preguntaRepo.findOne({
       where: { id: dto.preguntaId },
     });
 
     if (!pregunta) {
-      throw new NotFoundException(`Pregunta con ID ${dto.preguntaId} no encontrada`);
+      throw new NotFoundException(
+        `Pregunta con ID ${dto.preguntaId} no encontrada`,
+      );
     }
 
     const nuevaOpcion = this.opcionRepo.create({

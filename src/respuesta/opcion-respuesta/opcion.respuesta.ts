@@ -20,7 +20,9 @@ export class OpcionService {
     });
 
     if (!pregunta) {
-      throw new NotFoundException(`Pregunta con ID ${dto.preguntaId} no encontrada`);
+      throw new NotFoundException(
+        `Pregunta con ID ${dto.preguntaId} no encontrada`,
+      );
     }
 
     const nuevaOpcion = this.opcionRepo.create({

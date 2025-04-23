@@ -25,7 +25,9 @@ export class PreguntaService {
     });
 
     if (!encuesta) {
-      throw new NotFoundException(`Encuesta con ID ${dto.encuestaId} no encontrada`);
+      throw new NotFoundException(
+        `Encuesta con ID ${dto.encuestaId} no encontrada`,
+      );
     }
 
     const nuevaPregunta = this.preguntaRepo.create({
@@ -37,7 +39,7 @@ export class PreguntaService {
     const preguntaGuardada = await this.preguntaRepo.save(nuevaPregunta);
 
     if (dto.opciones && dto.opciones.length > 0) {
-      const opciones = dto.opciones.map(op => {
+      const opciones = dto.opciones.map((op) => {
         return this.opcionPreguntaRepo.create({
           texto: op.texto,
           pregunta: preguntaGuardada,

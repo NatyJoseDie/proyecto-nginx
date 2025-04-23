@@ -8,7 +8,9 @@ export class PreguntaController {
   constructor(private readonly preguntaService: PreguntaService) {}
 
   @Post()
-  async create(@Body() createPreguntaDto: CreatePreguntaDto): Promise<Pregunta> {
+  async create(
+    @Body() createPreguntaDto: CreatePreguntaDto,
+  ): Promise<Pregunta> {
     return this.preguntaService.create(createPreguntaDto);
   }
 

@@ -4,11 +4,15 @@ import { CreateOpcionRespuestaDto } from './dto/create-opcion-respuesta.dto';
 
 @Controller('opcion-respuesta')
 export class OpcionRespuestaController {
-  constructor(private readonly opcionRespuestaService: OpcionRespuestaService) {}
+  constructor(
+    private readonly opcionRespuestaService: OpcionRespuestaService,
+  ) {}
 
   @Post()
   create(@Body() createOpcionRespuestaDto: CreateOpcionRespuestaDto) {
-    return this.opcionRespuestaService.createRespuesta(createOpcionRespuestaDto);
+    return this.opcionRespuestaService.createRespuesta(
+      createOpcionRespuestaDto,
+    );
   }
 
   @Get()

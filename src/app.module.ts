@@ -13,7 +13,7 @@ import { PreguntaModule } from './pregunta/pregunta.module';
 import { RespuestaModule } from './respuesta/respuesta.module';
 import { OpcionRespuestaModule } from './respuesta/opcion-respuesta/opcion-respuesta.module';
 import * as dotenv from 'dotenv';
-dotenv.config()
+dotenv.config();
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -30,16 +30,16 @@ dotenv.config()
         Respuesta,
         RespuestaOpcion,
         RespuestaAbierta,
-        ConfiguracionAccesibilidad  // Added this line
+        ConfiguracionAccesibilidad, // Added this line
       ],
       synchronize: true,
       logging: true,
     }),
-    
-    TypeOrmModule.forFeature([Encuesta, Pregunta , Respuesta] ), // Added Pregunta
-    TypeOrmModule.forFeature([Encuesta, Pregunta,Respuesta]), // Added Pregunta
+
+    TypeOrmModule.forFeature([Encuesta, Pregunta, Respuesta]), // Added Pregunta
+    TypeOrmModule.forFeature([Encuesta, Pregunta, Respuesta]), // Added Pregunta
     PreguntaModule,
-    RespuestaModule,  // Añade esta línea
+    RespuestaModule, // Añade esta línea
     OpcionRespuestaModule,
   ],
   controllers: [EncuestaController],

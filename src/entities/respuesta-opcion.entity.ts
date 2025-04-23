@@ -7,10 +7,14 @@ export class RespuestaOpcion {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasOpciones, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasOpciones, {
+    onDelete: 'CASCADE',
+  })
   respuesta: Respuesta;
 
-  @ManyToOne(() => Opcion, (opcion) => opcion.respuestasOpciones, { eager: true })
+  @ManyToOne(() => Opcion, (opcion) => opcion.respuestasOpciones, {
+    eager: true,
+  })
   opcion: Opcion;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
