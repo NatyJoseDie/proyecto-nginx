@@ -14,7 +14,7 @@ export class Respuesta {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true }) // Permitir valores nulos temporalmente
+  @Column({ type: 'uuid', default: () => 'gen_random_uuid()', unique: true })
   codigoAcceso: string;
 
   @ManyToOne(() => Encuesta, (encuesta) => encuesta.respuestas, {

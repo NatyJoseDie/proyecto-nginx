@@ -1,89 +1,98 @@
-# Proyecto Web - pasos previos antes de desarrollar aplicacion 
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
 
-## Tecnologías Instaladas
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-### Frontend (Parte Visual)
-- **Angular**: 
-  - Es un framework (conjunto de herramientas) para crear aplicaciones web
-  - Permite crear páginas web dinámicas e interactivas
-  - Desarrollado por Google
-  - Usa TypeScript, una versión mejorada de JavaScript
+  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+    <p align="center">
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
+<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
+<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
+<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
+<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
+  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
+    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+</p>
+  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
+  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-- **PrimeNG**: 
-  - Es una colección de componentes visuales para Angular
-  - Proporciona elementos como botones, tablas, menús ya diseñados
-  - Ahorra tiempo al no tener que diseñar todo desde cero
-  - Tiene una documentación con ejemplos fáciles de seguir
+## Description
 
-### Backend (Servidor)
-- **NestJS**: 
-  - Es un framework para crear el servidor de la aplicación
-  - Maneja las peticiones que llegan desde el frontend
-  - Se conecta con la base de datos
-  - Está basado en Node.js y usa TypeScript
-  - Tiene una estructura organizada y fácil de mantener
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-- **TypeORM**: 
-  - Es una herramienta para trabajar con bases de datos
-  - Permite escribir código TypeScript en lugar de SQL
-  - Hace más fácil crear y modificar tablas en la base de datos
-  - Maneja las conexiones y consultas a la base de datos
+## Project setup
 
-### Base de Datos
-- **PostgreSQL**: 
-  - Es un sistema de base de datos profesional
-  - Almacena toda la información de la aplicación
-  - Es gratuito y de código abierto
-  - Muy usado en aplicaciones web modernas
-  - Tiene herramientas visuales como pgAdmin 4 para administrarlo
+```bash
+$ npm install
+```
 
-### Servidor Web
-- **Nginx**: 
-  - Es un servidor web que distribuye las peticiones
-  - Actúa como punto de entrada a nuestra aplicación
-  - Puede manejar muchas conexiones simultáneas
-  - Sirve los archivos estáticos (imágenes, CSS, etc.)
-  - Mejora la seguridad y el rendimiento
+## Compile and run the project
 
-### Gestión de Procesos
-- **PM2**: 
-  - Es un administrador de procesos para Node.js
-  - Mantiene la aplicación funcionando
-  - Reinicia automáticamente si hay errores
-  - Muestra logs y estadísticas
-  - Útil cuando la aplicación está en producción
+```bash
+# development
+$ npm run start
 
-## Puertos y Configuración
-- Frontend (Angular): Puerto 4200
-  - Aquí se ve la interfaz de usuario
-  - Se accede desde http://localhost:4200
+# watch mode
+$ npm run start:dev
 
-- Backend (NestJS): Puerto 3000
-  - Aquí corre el servidor
-  - Se accede desde http://localhost:3000
+# production mode
+$ npm run start:prod
+```
 
-- Base de datos (PostgreSQL): Puerto 5432
-  - Donde se conecta la base de datos
-  - Se administra con pgAdmin 4
+## Run tests
 
-- Nginx: Puerto 80
-  - Puerto principal para acceder a la aplicación
-  - Direcciona el tráfico al frontend o backend según sea necesario
+```bash
+# unit tests
+$ npm run test
 
-## Estructura del Proyecto
+# e2e tests
+$ npm run test:e2e
 
-## Flujo de Trabajo Básico
-1. El usuario accede a través del navegador (frontend)
-2. Angular maneja la interfaz y envía peticiones al backend
-3. NestJS (backend) procesa las peticiones
-4. TypeORM se comunica con PostgreSQL
-5. La base de datos almacena o devuelve información
-6. Nginx coordina todo el tráfico
-7. PM2 mantiene el servidor funcionando
+# test coverage
+$ npm run test:cov
+```
 
-## Herramientas de Desarrollo
-- Visual Studio Code: Para escribir código
-- pgAdmin 4: Para administrar la base de datos
-- Terminal/Consola: Para ejecutar comandos
-- Navegador web: Para probar la aplicación
+## Deployment
 
+When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+
+If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+
+```bash
+$ npm install -g mau
+$ mau deploy
+```
+
+With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+
+## Resources
+
+Check out a few resources that may come in handy when working with NestJS:
+
+- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
+- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
+- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
+- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
+- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
+- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
+- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
+- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+
+## Support
+
+Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+
+## Stay in touch
+
+- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
+
+## License
+
+Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
