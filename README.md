@@ -96,3 +96,55 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+# API de Encuestas
+
+## Características (main.ts)
+
+### Seguridad
+- **Helmet**: Protege la aplicación configurando varios encabezados HTTP
+- **Validación**: Usa validación estricta para DTOs con lista blanca y propiedades no permitidas
+
+### Estructura de la API
+- **Prefijo Global**: Todos los endpoints comienzan con `/api`
+- **Versionado**: Versionado de API habilitado (ej: `/api/v1/`)
+- **Serialización de Clases**: Controla la serialización de respuestas JSON
+
+### Documentación
+- **Swagger**: Documentación de la API disponible en `/api`
+  - Accede a la interfaz de documentación en: http://localhost:3000/api
+  - Pruebas interactivas de endpoints
+  - Información detallada del esquema
+
+### Validación
+- Validación de Objetos de Transferencia de Datos (DTOs)
+- Validación automática de datos de entrada
+- Conversión de tipos
+- Filtrado estricto de datos
+
+### Ubicación de las configuraciones
+Todas estas configuraciones se encuentran en el archivo `src/main.ts`
+
+## Inicio Rápido
+1. Instalar dependencias: `npm install`
+2. Iniciar el servidor: `npm run start`
+3. Visitar documentación Swagger: http://localhost:3000/api
+
+// ... contenido existente ...
+
+### Variables de Configuración (configuration.ts)
+La aplicación soporta las siguientes variables de entorno:
+
+#### Configuración General
+- `PORT`: Puerto del servidor (default: 3000)
+- `GLOBAL_PREFIX`: Prefijo global de la API (default: 'api')
+- `SWAGGER_HABILITADO`: Habilita la documentación Swagger
+
+#### Configuración de Base de Datos
+- `DB_HOST`: Host de la base de datos (default: 'localhost')
+- `DB_PORT`: Puerto de la base de datos (default: 5432)
+- `DB_USER`: Usuario de la base de datos
+- `DB_PASSWORD`: Contraseña de la base de datos
+- `DB_NAME`: Nombre de la base de datos
+- `DB_LOGGING`: Habilita el logging de la base de datos
+- `DB_LOGGER`: Tipo de logger a utilizar
