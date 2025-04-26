@@ -14,7 +14,7 @@ export class Respuesta {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true }) // Permitir valores nulos temporalmente
   codigoAcceso: string;
 
   @ManyToOne(() => Encuesta, (encuesta) => encuesta.respuestas, {
