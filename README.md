@@ -96,6 +96,7 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+<<<<<<< HEAD
 
 # API de Encuestas
 
@@ -148,3 +149,5 @@ La aplicación soporta las siguientes variables de entorno:
 - `DB_NAME`: Nombre de la base de datos
 - `DB_LOGGING`: Habilita el logging de la base de datos
 - `DB_LOGGER`: Tipo de logger a utilizar
+=======
+>>>>>>> a557459f475bafc841c466586223954d86a68ff3
