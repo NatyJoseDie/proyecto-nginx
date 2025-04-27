@@ -5,11 +5,9 @@ import {
   IsEnum,
   IsArray,
   IsOptional,
-  IsUrl,
+  IsBoolean,
 } from 'class-validator';
 import { TipoRespuesta } from '../enums/tipo-respuesta.enum';
-
-import { Type } from 'class-transformer';
 
 export class CreatePreguntaDto {
   @IsNumber()
@@ -24,12 +22,8 @@ export class CreatePreguntaDto {
   tipoRespuesta: TipoRespuesta;
 
   @IsOptional()
-  @IsString()
-  urlVideo?: string;
-
-  @IsOptional()
-  @IsString()
-  urlAudio?: string;
+  @IsBoolean()
+  seleccionMultiple?: boolean;
 
   @IsOptional()
   @IsArray()
