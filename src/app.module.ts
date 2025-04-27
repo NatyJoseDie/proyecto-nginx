@@ -3,6 +3,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
 import { EncuestasModule } from './modules/encuestas/encuestas.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Encuesta } from './modules/encuestas/entities/encuesta.entity';
+import { Pregunta } from './modules/encuestas/entities/pregunta.entity';
+import { Opcion } from './modules/encuestas/entities/opcion.entity';
+import { Respuesta } from './modules/encuestas/entities/respuesta.entity';
+import { RespuestaOpcion } from './modules/encuestas/entities/respuesta-opcion.entity';
+import { RespuestaAbierta } from './modules/encuestas/entities/respuesta-abierta.entity';
 
 @Module({
   imports: [
@@ -22,6 +28,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         username: configService.get('database.username'),
         password: configService.get('database.password'),
         database: configService.get('database.name'),
+        entities: [
+          Encuesta,
+          Pregunta,
+          Opcion,
+          Respuesta,
+          RespuestaOpcion,
+          RespuestaAbierta,
+        ],
         synchronize: false,
         autoLoadEntities: true,
         logging: configService.get('database.logging'),
