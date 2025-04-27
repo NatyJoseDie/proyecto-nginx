@@ -7,9 +7,6 @@ export class RespuestaOpcion {
   @PrimaryGeneratedColumn()
   id: number;
 
-<<<<<<<< HEAD:src/modules/encuestas/entities/respuesta-opcion.entity.ts
-  @ManyToOne(() => Opcion, (opcion) => opcion.respuestasOpciones)
-========
   @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasOpciones, {
     onDelete: 'CASCADE',
   })
@@ -18,11 +15,7 @@ export class RespuestaOpcion {
   @ManyToOne(() => Opcion, (opcion) => opcion.respuestasOpciones, {
     eager: true,
   })
->>>>>>>> a557459f475bafc841c466586223954d86a68ff3:src/entities/respuesta-opcion.entity.ts
   opcion: Opcion;
-
-  @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasOpciones)
-  respuesta: Respuesta;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   tiempoRespuesta: Date;

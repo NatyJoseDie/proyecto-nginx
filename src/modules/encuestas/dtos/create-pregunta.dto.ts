@@ -7,7 +7,7 @@ import {
   IsOptional,
   IsUrl,
 } from 'class-validator';
-import { TipoRespuesta } from '../../enums/tipo-respuesta.enum';
+import { TipoRespuesta } from '../enums/tipo-respuesta.enum';
 
 import { Type } from 'class-transformer';
 

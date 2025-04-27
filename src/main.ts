@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
@@ -9,52 +8,50 @@ import {
   VersioningType,
 } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-=======
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
->>>>>>> a557459f475bafc841c466586223954d86a68ff3
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-<<<<<<< HEAD
-  // Seguridad
   app.use(helmet());
 
-  // Prefijo global para la API
-  app.setGlobalPrefix('api');
+  const configService = app.get(ConfigService);
 
-  // Versionado
+  // CORS
+  app.enableCors({
+    origin: 'http://localhost:4200',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+
+  const globalPrefix: string = configService.get('prefix') as string;
+
+  app.setGlobalPrefix(globalPrefix);
+
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
   });
 
-  // Validación
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-  // Swagger
-  const config = new DocumentBuilder()
-    .setTitle('Encuestas')
-    .setDescription('API del sistema de encuestas')
-    .setVersion('1.0')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  const swaggerHabilitado: boolean = configService.get(
+    'swaggerHabilitado',
+  ) as boolean;
 
-=======
-  // Habilitar CORS
-  app.enableCors({
-    origin: 'http://localhost:4200', // URL de tu frontend Angular
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
+  if (swaggerHabilitado) {
+    const config = new DocumentBuilder()
+      .setTitle('Encuestas')
+      .setDescription('Descripción de la API del sistema de encuestas')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup(globalPrefix, app, document);
+  }
 
->>>>>>> a557459f475bafc841c466586223954d86a68ff3
-  await app.listen(3000);
+  const port: number = configService.get<number>('port') as number;
+  await app.listen(port);
 }
 bootstrap();

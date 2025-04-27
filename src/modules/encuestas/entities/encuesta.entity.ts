@@ -3,10 +3,8 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToMany,
-  OneToOne,
 } from 'typeorm';
 import { Pregunta } from './pregunta.entity';
-import { ConfiguracionAccesibilidad } from './configuracion-accesibilidad.entity';
 import { Respuesta } from './respuesta.entity';
 
 @Entity('encuestas')
@@ -30,9 +28,4 @@ export class Encuesta {
     cascade: true,
   })
   respuestas: Respuesta[];
-
-  @OneToOne(() => ConfiguracionAccesibilidad, (config) => config.encuesta, {
-    cascade: true,
-  })
-  configuracionAccesibilidad: ConfiguracionAccesibilidad;
 }
