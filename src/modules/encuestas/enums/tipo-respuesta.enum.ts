@@ -1,4 +1,5 @@
 export enum TipoRespuesta {
   ABIERTA = 'abierta',
-  OPCION = 'opcion'
+  OPCION_SIMPLE = 'opcion_simple',
+  OPCION_MULTIPLE = 'opcion_multiple',
 }

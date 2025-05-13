@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Encuesta } from '../entities/encuesta.entity';
 import { CreateEncuestaDto } from '../dtos/create-encuesta.dto';
 import { UpdateEncuestaDto } from '../dtos/update-encuesta.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class EncuestasService {
@@ -25,8 +26,26 @@ export class EncuestasService {
   }
 
   async create(createEncuestaDto: CreateEncuestaDto) {
-    const nuevaEncuesta = this.encuestaRepository.create(createEncuestaDto);
+    const nuevaEncuesta = this.encuestaRepository.create({
+      ...createEncuestaDto,
+      codigoRespuesta: uuidv4(),
+      codigoResultados: uuidv4(),
+    });
     return await this.encuestaRepository.save(nuevaEncuesta);
+  }
+
+  async obtenerPorCodigoRespuesta(codigo: string) {
+    return await this.encuestaRepository.findOne({
+      where: { codigoRespuesta: codigo },
+      relations: ['preguntas', 'preguntas.opciones'],
+    });
+  }
+
+  async obtenerPorCodigoResultados(codigo: string) {
+    return await this.encuestaRepository.findOne({
+      where: { codigoResultados: codigo },
+      relations: ['preguntas', 'preguntas.opciones', 'respuestas'],
+    });
   }
 
   async update(id: number, updateEncuestaDto: UpdateEncuestaDto) {

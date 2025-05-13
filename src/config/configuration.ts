@@ -1,6 +1,6 @@
 export default () => ({
   port: parseInt(process.env.PORT || '3000'),
-  prefix: process.env.GLOBAL_PREFIX || 'api',  // Quitar el /v1
+  prefix: process.env.GLOBAL_PREFIX || 'api',  
   swaggerHabilitado: process.env.SWAGGER_HABILITADO === 'true',
   database: {
     host: process.env.DB_HOST || 'localhost',

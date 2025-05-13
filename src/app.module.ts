@@ -36,7 +36,7 @@ import { RespuestaAbierta } from './modules/encuestas/entities/respuesta-abierta
           RespuestaOpcion,
           RespuestaAbierta,
         ],
-        synchronize: false,
+        synchronize: true, // Cambiado a true para desarrollo
         autoLoadEntities: true,
         logging: configService.get('database.logging'),
         logger: configService.get('database.logger'),

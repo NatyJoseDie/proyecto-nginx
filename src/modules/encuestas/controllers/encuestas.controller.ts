@@ -4,13 +4,23 @@ import { CreateEncuestaDto } from '../dtos/create-encuesta.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Encuestas')
-@Controller('/encuestas')
+@Controller('encuestas')
 export class EncuestasController {
   constructor(private readonly encuestasService: EncuestasService) {}
 
   @Get()
   findAll() {
     return this.encuestasService.findAll();
+  }
+
+  @Get('responder/:codigo')
+  obtenerEncuestaParaResponder(@Param('codigo') codigo: string) {
+    return this.encuestasService.obtenerPorCodigoRespuesta(codigo);
+  }
+
+  @Get('resultados/:codigo')
+  obtenerResultados(@Param('codigo') codigo: string) {
+    return this.encuestasService.obtenerPorCodigoResultados(codigo);
   }
 
   @Get(':id')
