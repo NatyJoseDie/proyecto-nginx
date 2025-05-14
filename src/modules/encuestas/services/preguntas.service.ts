@@ -34,20 +34,20 @@ export class PreguntasService {
 
   async create(createPreguntaDto: CreatePreguntaDto) {
     const { opciones, ...preguntaData } = createPreguntaDto;
-    
+
     // Crear la pregunta sin opciones primero
     const nuevaPregunta = this.preguntaRepository.create(preguntaData);
     const preguntaGuardada = await this.preguntaRepository.save(nuevaPregunta);
 
     // Si se proporcionan opciones, crearlas por separado
     if (opciones && opciones.length > 0) {
-      const opcionesEntities = opciones.map(texto => {
+      const opcionesEntities = opciones.map((texto) => {
         return {
           texto,
-          pregunta: preguntaGuardada
+          pregunta: preguntaGuardada,
         };
       });
-      
+
       // Guardar opciones con referencia a la pregunta
       await this.opcionRepository.save(opcionesEntities);
     }
@@ -58,21 +58,21 @@ export class PreguntasService {
   async update(id: number, updatePreguntaDto: UpdatePreguntaDto) {
     const pregunta = await this.findOne(id);
     const { opciones, ...preguntaData } = updatePreguntaDto;
-    
+
     // Actualizar los datos de la pregunta
     this.preguntaRepository.merge(pregunta, preguntaData);
     await this.preguntaRepository.save(pregunta);
-    
+
     // Si se proporcionan opciones, actualizarlas
     if (opciones) {
       // Eliminar opciones existentes
       await this.opcionRepository.delete({ pregunta: { id } });
-      
+
       // Crear nuevas opciones
       if (opciones.length > 0) {
-        const opcionesEntities = opciones.map(texto => ({
+        const opcionesEntities = opciones.map((texto) => ({
           texto,
-          pregunta
+          pregunta,
         }));
         await this.opcionRepository.save(opcionesEntities);
       }
