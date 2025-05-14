@@ -36,6 +36,7 @@ import { RespuestaAbierta } from './modules/encuestas/entities/respuesta-abierta
           RespuestaOpcion,
           RespuestaAbierta,
         ],
+        // Esto puede modificar la BD sin consultar, se cambió a false
         synchronize: true, // Cambiado a true para desarrollo
         autoLoadEntities: true,
         logging: configService.get('database.logging'),
