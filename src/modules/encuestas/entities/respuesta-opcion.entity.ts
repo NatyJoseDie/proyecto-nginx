@@ -24,13 +24,4 @@ export class RespuestaOpcion {
   })
   @JoinColumn({ name: 'id_opcion' })
   opcion: Opcion;
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  tiempoRespuesta: Date;
-
-  @Column({ type: 'varchar', nullable: true })
-  metodoSeleccion: string;
-
-  @Column({ type: 'boolean', default: false })
-  requirioAsistencia: boolean;
 }
