@@ -1,9 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Pregunta } from './pregunta.entity';
 import { Respuesta } from './respuesta.entity';
 
@@ -14,7 +9,8 @@ export class Encuesta {
 
   @Column({ type: 'varchar', nullable: false })
   nombre: string;
-
+  @Column({ default: true })
+  activa: boolean;
   @Column({ name: 'codigo_respuesta', type: 'varchar', nullable: false })
   codigoRespuesta: string;
 

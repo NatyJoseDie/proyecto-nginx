@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { Encuesta } from './encuesta.entity';
 import { Opcion } from './opcion.entity';
@@ -29,6 +30,7 @@ export class Pregunta {
   tipoRespuesta: TipoRespuesta;
 
   @ManyToOne(() => Encuesta, (encuesta) => encuesta.preguntas)
+  @JoinColumn({ name: 'id_encuesta' })
   encuesta: Encuesta;
 
   @OneToMany(

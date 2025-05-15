@@ -9,9 +9,7 @@ import { EncuestasController } from './controllers/encuestas.controller';
 import { EncuestasService } from './services/encuestas.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Pregunta, Opcion, Encuesta])
-  ],
+  imports: [TypeOrmModule.forFeature([Pregunta, Opcion, Encuesta])],
   controllers: [PreguntasController, EncuestasController],
   providers: [PreguntasService, EncuestasService],
   exports: [PreguntasService, EncuestasService],

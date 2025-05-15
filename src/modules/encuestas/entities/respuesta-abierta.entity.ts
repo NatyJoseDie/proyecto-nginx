@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Pregunta } from './pregunta.entity';
 import { Respuesta } from './respuesta.entity';
 
@@ -10,12 +16,11 @@ export class RespuestaAbierta {
   @Column({ type: 'varchar', nullable: false })
   texto: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  audioRespuesta: string;
-
   @ManyToOne(() => Pregunta, (pregunta) => pregunta.respuestasAbiertas)
+  @JoinColumn({ name: 'id_pregunta' })
   pregunta: Pregunta;
 
   @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasAbiertas)
+  @JoinColumn({ name: 'id_respuesta' })
   respuesta: Respuesta;
 }
