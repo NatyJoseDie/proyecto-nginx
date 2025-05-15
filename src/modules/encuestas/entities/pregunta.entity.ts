@@ -1,43 +1,44 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  OneToMany,
-} from 'typeorm';
 import { Encuesta } from './encuesta.entity';
+import { Exclude } from 'class-transformer';
 import { Opcion } from './opcion.entity';
+import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { RespuestaAbierta } from './respuesta-abierta.entity';
-import { TipoRespuesta } from '../enums/tipo-respuesta.enum';
 
-@Entity('preguntas')
+@Entity({ name: 'preguntas' })
 export class Pregunta {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'int', nullable: false })
+  @Column()
   numero: number;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column()
   texto: string;
 
-  @Column({
-    type: 'enum',
-    enum: TipoRespuesta,
-    default: TipoRespuesta.ABIERTA,
-  })
-  tipoRespuesta: TipoRespuesta;
+  @Column({ type: 'enum', enum: TiposRespuestaEnum })
+  tipo: TiposRespuestaEnum;
 
-  @ManyToOne(() => Encuesta, (encuesta) => encuesta.preguntas)
+  @ManyToOne(() => Encuesta)
+  @JoinColumn({ name: 'id_encuesta' })
+  @Exclude()
   encuesta: Encuesta;
+
+  @OneToMany(() => Opcion, (opcion) => opcion.pregunta, {
+    cascade: ['insert'],
+  })
+  opciones: Opcion[];
 
   @OneToMany(
     () => RespuestaAbierta,
     (respuestaAbierta) => respuestaAbierta.pregunta,
-    { cascade: true },
   )
-  respuestasAbiertas: RespuestaAbierta[];
-
-  @OneToMany(() => Opcion, (opcion) => opcion.pregunta, { cascade: true })
-  opciones: Opcion[];
+  respuestas: RespuestaAbierta[];
 }

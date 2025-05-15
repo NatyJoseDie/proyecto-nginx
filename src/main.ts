@@ -1,6 +1,5 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import helmet from 'helmet';
 import { ConfigService } from '@nestjs/config';
 import {
   ClassSerializerInterceptor,
@@ -8,34 +7,32 @@ import {
   VersioningType,
 } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(helmet());
 
+  //acceder a la variables del  entorno ya procesadas
   const configService = app.get(ConfigService);
-
-  // CORS
-  app.enableCors({
-    origin: 'http://localhost:4200',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
 
   const globalPrefix: string = configService.get('prefix') as string;
 
   app.setGlobalPrefix(globalPrefix);
 
+  //versionado http.//localhost:3000/api/v1
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
   });
 
+  //verificar que el objeto tenga las propiedades que queremos, restringe los objetos que recibe la app
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
 
+  //cuando se retorna un objeto por ej no devuelva contraseñas
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   const swaggerHabilitado: boolean = configService.get(
@@ -45,12 +42,11 @@ async function bootstrap() {
   if (swaggerHabilitado) {
     const config = new DocumentBuilder()
       .setTitle('Encuestas')
-      .setDescription('Descripción de la API del sistema de encuestas')
+      .setDescription('Descripción de la Api del sistema de encuestas')
       .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup(globalPrefix, app, document);
   }
-
   const port: number = configService.get<number>('port') as number;
   await app.listen(port);
 }

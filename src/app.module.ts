@@ -3,12 +3,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
 import { EncuestasModule } from './modules/encuestas/encuestas.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Encuesta } from './modules/encuestas/entities/encuesta.entity';
-import { Pregunta } from './modules/encuestas/entities/pregunta.entity';
-import { Opcion } from './modules/encuestas/entities/opcion.entity';
-import { Respuesta } from './modules/encuestas/entities/respuesta.entity';
-import { RespuestaOpcion } from './modules/encuestas/entities/respuesta-opcion.entity';
-import { RespuestaAbierta } from './modules/encuestas/entities/respuesta-abierta.entity';
 
 @Module({
   imports: [
@@ -18,6 +12,8 @@ import { RespuestaAbierta } from './modules/encuestas/entities/respuesta-abierta
       isGlobal: true,
       ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
+
+    // Se extraen los datos del configService (que son los que trae de configruraciones los cuales se extrajeron del .env)
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -28,16 +24,7 @@ import { RespuestaAbierta } from './modules/encuestas/entities/respuesta-abierta
         username: configService.get('database.username'),
         password: configService.get('database.password'),
         database: configService.get('database.name'),
-        entities: [
-          Encuesta,
-          Pregunta,
-          Opcion,
-          Respuesta,
-          RespuestaOpcion,
-          RespuestaAbierta,
-        ],
-        // Esto puede modificar la BD sin consultar, se cambió a false
-        synchronize: true, // Cambiado a true para desarrollo
+        synchronize: false,
         autoLoadEntities: true,
         logging: configService.get('database.logging'),
         logger: configService.get('database.logger'),
