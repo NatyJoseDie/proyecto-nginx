@@ -10,7 +10,8 @@ export class Encuesta {
 
   @Column()
   nombre: string;
-
+  @Column({ default: true })
+  activa: boolean;
   @OneToMany(() => Pregunta, (pregunta) => pregunta.encuesta, {
     cascade: ['insert'],
   })
