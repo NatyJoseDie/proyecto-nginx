@@ -4,7 +4,11 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+<<<<<<< HEAD
+  JoinColumn,
+=======
   PrimaryGeneratedColumn,
+>>>>>>> leandro
 } from 'typeorm';
 
 import { Exclude } from 'class-transformer';
@@ -22,8 +26,14 @@ export class Opcion {
   @Column()
   numero: number;
 
+<<<<<<< HEAD
   @ManyToOne(() => Pregunta, (pregunta) => pregunta.opciones)
   @JoinColumn({ name: 'id_pregunta' })
+=======
+  @ManyToOne(() => Pregunta)
+  @JoinColumn({ name: 'id_pregunta' })
+  @Exclude()
+>>>>>>> leandro
   pregunta: Pregunta;
 
   @OneToMany(() => RespuestaOpcion, (respuestaOpcion) => respuestaOpcion.opcion)
