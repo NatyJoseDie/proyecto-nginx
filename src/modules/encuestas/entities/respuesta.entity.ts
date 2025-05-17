@@ -1,16 +1,9 @@
 import {
   Entity,
-<<<<<<< HEAD
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  OneToMany,
-  JoinColumn,
-=======
   JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
->>>>>>> leandro
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Encuesta } from './encuesta.entity';
@@ -25,7 +18,6 @@ export class Respuesta {
   @ManyToOne(() => Encuesta)
   @JoinColumn({ name: 'id_encuesta' })
   @Exclude()
-
   encuesta: Encuesta;
 
   @OneToMany(
@@ -37,7 +29,6 @@ export class Respuesta {
   )
   respuestasOpciones: RespuestaOpcion[];
 
-
   @OneToMany(
     () => RespuestaAbierta,
     (respuestaAbierta) => respuestaAbierta.respuesta,
@@ -46,5 +37,4 @@ export class Respuesta {
     },
   )
   respuestasAbiertas: RespuestaAbierta[];
-
 }

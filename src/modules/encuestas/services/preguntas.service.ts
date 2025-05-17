@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pregunta } from '../entities/pregunta.entity';
 import { CreatePreguntaDTO } from '../dtos/create-pregunta.dto';
-import { UpdatePreguntaDto } from '../dtos/update-pregunta.dto';
+import { UpdatePreguntaDTO } from '../dtos/update-pregunta.dto';
 import { Opcion } from '../entities/opcion.entity';
 import { CreateOpcionDTO } from '../dtos/create-opcion.dto';
 import { error } from 'console';
@@ -67,7 +67,7 @@ export class PreguntasService {
     return this.findOne(preguntaGuardada.id);
   }
 
-  async update(id: number, updatePreguntaDto: UpdatePreguntaDto) {
+  async update(id: number, updatePreguntaDto: UpdatePreguntaDTO) {
     const pregunta = await this.findOne(id);
     const { opciones, ...preguntaData } = updatePreguntaDto;
 
