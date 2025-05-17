@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
+
 import { Pregunta } from './pregunta.entity';
 import { Respuesta } from './respuesta.entity';
 

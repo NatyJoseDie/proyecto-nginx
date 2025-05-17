@@ -7,10 +7,11 @@ import {
   Delete,
   Patch,
 } from '@nestjs/common';
-import { PreguntasService } from '../services/preguntas.service';
-import { CreatePreguntaDto } from '../dtos/create-pregunta.dto';
+
 import { UpdatePreguntaDto } from '../dtos/update-pregunta.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { PreguntasService } from '../services/preguntas.service';
+import { CreatePreguntaDTO } from '../dtos/create-pregunta.dto';
 
 @ApiTags('Preguntas')
 @Controller('preguntas')
@@ -28,16 +29,17 @@ export class PreguntasController {
   }
 
   @Post()
-  create(@Body() createPreguntaDto: CreatePreguntaDto) {
-    return this.preguntasService.create(createPreguntaDto);
+  create(@Body() createPreguntaDTO: CreatePreguntaDTO) {
+    return this.preguntasService.create(createPreguntaDTO);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: number,
-    @Body() updatePreguntaDto: UpdatePreguntaDto,
+
+    @Body() updatePreguntaDTO: UpdatePreguntaDto,
   ) {
-    return this.preguntasService.update(id, updatePreguntaDto);
+    return this.preguntasService.update(id, updatePreguntaDTO);
   }
 
   @Delete(':id')

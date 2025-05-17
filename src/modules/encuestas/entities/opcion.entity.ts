@@ -22,9 +22,8 @@ export class Opcion {
   @Column()
   numero: number;
 
-  @ManyToOne(() => Pregunta)
+  @ManyToOne(() => Pregunta, (pregunta) => pregunta.opciones)
   @JoinColumn({ name: 'id_pregunta' })
-  @Exclude()
   pregunta: Pregunta;
 
   @OneToMany(() => RespuestaOpcion, (respuestaOpcion) => respuestaOpcion.opcion)
