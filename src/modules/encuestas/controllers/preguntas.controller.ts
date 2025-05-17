@@ -41,15 +41,11 @@ export class PreguntasController {
   @Patch(':id')
   update(
     @Param('id') id: number,
-<<<<<<< HEAD
-    @Body() updatePreguntaDto: UpdatePreguntaDto,
-  ) {
-    return this.preguntasService.update(id, updatePreguntaDto);
-=======
+
     @Body() updatePreguntaDTO: UpdatePreguntaDto,
   ) {
     return this.preguntasService.update(id, updatePreguntaDTO);
->>>>>>> leandro
+
   }
 
   @Delete(':id')
