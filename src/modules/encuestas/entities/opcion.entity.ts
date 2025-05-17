@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Exclude } from 'class-transformer';
 import { Pregunta } from './pregunta.entity';
