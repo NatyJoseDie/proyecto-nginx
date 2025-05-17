@@ -5,7 +5,6 @@ import {
   OneToMany,
   JoinColumn,
   PrimaryGeneratedColumn,
->>>>>>> leandro
 } from 'typeorm';
 
 import { Exclude } from 'class-transformer';

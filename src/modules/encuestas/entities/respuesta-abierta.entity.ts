@@ -1,12 +1,4 @@
 import {
-<<<<<<< HEAD
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
-=======
   Column,
   Entity,
   JoinColumn,
@@ -14,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
->>>>>>> leandro
+
 import { Pregunta } from './pregunta.entity';
 import { Respuesta } from './respuesta.entity';
 
@@ -26,14 +18,9 @@ export class RespuestaAbierta {
   @Column()
   texto: string;
 
-<<<<<<< HEAD
-  @ManyToOne(() => Pregunta, (pregunta) => pregunta.respuestasAbiertas)
-  @JoinColumn({ name: 'id_pregunta' })
-=======
   @ManyToOne(() => Pregunta)
   @JoinColumn({ name: 'id_pregunta' })
   @Exclude()
->>>>>>> leandro
   pregunta: Pregunta;
 
   @Expose()
@@ -43,9 +30,6 @@ export class RespuestaAbierta {
 
   @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasAbiertas)
   @JoinColumn({ name: 'id_respuesta' })
-<<<<<<< HEAD
-=======
   @Exclude()
->>>>>>> leandro
   respuesta: Respuesta;
 }

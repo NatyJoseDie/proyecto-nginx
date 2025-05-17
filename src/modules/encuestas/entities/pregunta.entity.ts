@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  OneToMany,
-  JoinColumn,
-} from 'typeorm';
-=======
->>>>>>> leandro
 import { Encuesta } from './encuesta.entity';
 import { Exclude } from 'class-transformer';
 import { Opcion } from './opcion.entity';
@@ -37,14 +26,9 @@ export class Pregunta {
   @Column({ type: 'enum', enum: TiposRespuestaEnum })
   tipo: TiposRespuestaEnum;
 
-<<<<<<< HEAD
-  @ManyToOne(() => Encuesta, (encuesta) => encuesta.preguntas)
-  @JoinColumn({ name: 'id_encuesta' })
-=======
   @ManyToOne(() => Encuesta)
   @JoinColumn({ name: 'id_encuesta' })
   @Exclude()
->>>>>>> leandro
   encuesta: Encuesta;
 
   @OneToMany(() => Opcion, (opcion) => opcion.pregunta, {

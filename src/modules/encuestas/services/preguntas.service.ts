@@ -49,11 +49,7 @@ export class PreguntasService {
     // Si se proporcionan opciones, crearlas por separado
     let opcionesEntities: { texto: CreateOpcionDTO; pregunta: Pregunta }[];
     if (opciones && opciones.length > 0) {
-<<<<<<< HEAD
       const opcionesEntities = opciones.map((texto) => {
-=======
-      opcionesEntities = opciones.map((texto) => {
->>>>>>> leandro
         return {
           texto,
           pregunta: preguntaGuardada,
