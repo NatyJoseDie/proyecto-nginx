@@ -9,18 +9,15 @@ export class RespuestaOpcion {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Opcion)
-  @JoinColumn({ name: 'id_opcion' })
-  @Exclude()
-  opcion: Opcion;
-
-  @Expose()
-  get opcionId(): number {
-    return this.opcion?.id;
-  }
-
-  @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasOpciones)
+  @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasOpciones, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'id_respuesta' })
-  @Exclude()
   respuesta: Respuesta;
+
+  @ManyToOne(() => Opcion, (opcion) => opcion.respuestasOpciones, {
+    eager: true,
+  })
+  @JoinColumn({ name: 'id_opcion' })
+  opcion: Opcion;
 }
