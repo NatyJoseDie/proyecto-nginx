@@ -10,6 +10,8 @@ import { RespuestaAbierta } from './entities/respuesta-abierta.entity';
 import { RespuestaOpcion } from './entities/respuesta-opcion.entity';
 import { RespuestasController } from './controllers/respuestas.controller';
 import { RespuestasService } from './services/respuestas.service';
+import { PreguntasController } from './controllers/preguntas.controller';
+import { PreguntasService } from './services/preguntas.service';
 
 @Module({
   imports: [
@@ -22,9 +24,9 @@ import { RespuestasService } from './services/respuestas.service';
       RespuestaOpcion,
     ]),
   ],
-  controllers: [EncuestasController, RespuestasController],
+  controllers: [EncuestasController, RespuestasController, PreguntasController],
   //definen los métdos que manejan las solicitudes a determionadas rutas
-  providers: [EncuestasService, RespuestasService],
+  providers: [EncuestasService, RespuestasService, PreguntasService],
   //objetos de una clase que el framework va a dejar disponible para que se pueda inyectar
   // imports: []
 })

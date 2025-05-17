@@ -32,7 +32,7 @@ export class Pregunta {
   encuesta: Encuesta;
 
   @OneToMany(() => Opcion, (opcion) => opcion.pregunta, {
-    cascade: ['insert'],
+    cascade: ['insert', 'remove'],
   })
   opciones: Opcion[];
 

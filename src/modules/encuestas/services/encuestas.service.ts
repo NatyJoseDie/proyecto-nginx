@@ -5,6 +5,7 @@ import { Encuesta } from '../entities/encuesta.entity';
 import { CodigoTipoEnum } from '../enums/codigo-tipo.enum';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 import { v4 } from 'uuid';
+import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
 
 @Injectable()
 export class EncuestasService {
@@ -86,5 +87,45 @@ export class EncuestasService {
       throw new BadRequestException('Datos de encuesta no válidos');
     }
     return encuesta;
+  }
+  async seedDb() {
+    // const queryBuilder = this.encuestasRepository.createQueryBuilder();
+
+    const encuesta: Encuesta = new Encuesta();
+    Object.assign(encuesta, {
+      nombre: 'encuesta batch test',
+      codigoRespuesta: v4(),
+      codigoResultados: v4(),
+      preguntas: [
+        {
+          tipo: 'ABIERTA',
+          numero: 1,
+          texto: 'Que lenguajes de programacion manejas 678?',
+        },
+      ],
+    });
+    const encuestas: Encuesta[] = [encuesta];
+    for (const encuesta of encuestas) {
+      console.log('current e', encuesta);
+      return await this.encuestasRepository.save(encuesta);
+    }
+    // return await queryBuilder
+    //   .insert()
+    //   .into(Encuesta)
+    //   .values([
+    //     {
+    //       nombre: `Encuesta`,
+    //       codigoRespuesta: v4(),
+    //       codigoResultados: v4(),
+    //       preguntas: [
+    //         {
+    //           tipo: TiposRespuestaEnum.ABIERTA,
+    //           numero: 1,
+    //           texto: 'Que lenguajes de programacion manejas ?',
+    //         },
+    //       ],
+    //     },
+    //   ])
+    //   .execute();
   }
 }

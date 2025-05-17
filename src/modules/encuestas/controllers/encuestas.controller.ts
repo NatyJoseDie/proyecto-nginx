@@ -30,4 +30,8 @@ export class EncuestasController {
       dto.tipo,
     );
   }
+  @Post('seed')
+  async seedEncuesta() {
+    return await this.encuestasService.seedDb();
+  }
 }
