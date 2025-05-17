@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 import { Pregunta } from './pregunta.entity';
 import { Exclude } from 'class-transformer';
@@ -14,14 +14,15 @@ export class Encuesta {
   @Column({ default: true })
   activa: boolean;
 
-  @OneToMany(() => Pregunta, (pregunta) => pregunta.encuesta, { cascade: true })
-  @OneToMany(() => Respuesta, (respuesta) => respuesta.encuesta)
-  respuestas: Respuesta[];
-
-  @Column({ name: 'codigo_respuesta' })
+  @Column({ name: 'codigo_respuesta', type: 'varchar', nullable: false })
   codigoRespuesta: string;
 
-  @Column({ name: 'codigo_resultados' })
-  @Exclude()
+  @Column({ name: 'codigo_resultados', type: 'varchar', nullable: false })
   codigoResultados: string;
+
+  @OneToMany(() => Pregunta, (pregunta) => pregunta.encuesta, { cascade: true })
+  preguntas: Pregunta[];
+
+  @OneToMany(() => Respuesta, (respuesta) => respuesta.encuesta)
+  respuestas: Respuesta[];
 }
