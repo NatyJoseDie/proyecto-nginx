@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 
 import { Exclude } from 'class-transformer';
 import { Pregunta } from './pregunta.entity';
@@ -22,9 +15,8 @@ export class Opcion {
   @Column()
   numero: number;
 
-  @ManyToOne(() => Pregunta)
+  @ManyToOne(() => Pregunta, (pregunta) => pregunta.opciones)
   @JoinColumn({ name: 'id_pregunta' })
-  @Exclude()
   pregunta: Pregunta;
 
   @OneToMany(() => RespuestaOpcion, (respuestaOpcion) => respuestaOpcion.opcion)
