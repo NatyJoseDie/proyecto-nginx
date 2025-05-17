@@ -86,10 +86,13 @@ export class PreguntasService {
           texto,
           pregunta,
         }));
-        await this.opcionRepository.save(opcionesEntities);
+        // await this.opcionRepository.save(opcionesEntities);
       }
     }
-
+    throw new HttpException(
+      'Chequear metodo , error de tipos',
+      HttpStatus.BAD_REQUEST,
+    );
     return this.findOne(id);
   }
 
