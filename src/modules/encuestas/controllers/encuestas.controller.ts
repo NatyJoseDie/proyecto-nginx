@@ -1,45 +1,33 @@
-import { Controller, Get, Post, Body, Param, Delete, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Query } from '@nestjs/common';
+
 import { EncuestasService } from '../services/encuestas.service';
-import { CreateEncuestaDto } from '../dtos/create-encuesta.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 
-@ApiTags('Encuestas')
-@Controller('encuestas')
+import { ObtenerEncuestaDTO } from '../dtos/obtener-encuesta.dto';
+import { Encuesta } from '../entities/encuesta.entity';
+
+@Controller('/encuestas')
 export class EncuestasController {
-  constructor(private readonly encuestasService: EncuestasService) {}
+  constructor(private encuestasService: EncuestasService) {}
 
-  @Get()
-  findAll() {
-    return this.encuestasService.findAll();
-  }
-
-  @Get('responder/:codigo')
-  obtenerEncuestaParaResponder(@Param('codigo') codigo: string) {
-    return this.encuestasService.obtenerPorCodigoRespuesta(codigo);
-  }
-
-  @Get('resultados/:codigo')
-  obtenerResultados(@Param('codigo') codigo: string) {
-    return this.encuestasService.obtenerPorCodigoResultados(codigo);
+  @Post()
+  async crearEncuesta(@Body() dto: CreateEncuestaDTO): Promise<{
+    id: number;
+    codigoRespuesta: string;
+    codigoResultados: string;
+  }> {
+    return await this.encuestasService.crearEncuesta(dto);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.encuestasService.findOne(id);
-  }
-
-  @Post()
-  create(@Body() createEncuestaDto: CreateEncuestaDto) {
-    return this.encuestasService.create(createEncuestaDto);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: number, @Body() body: any) {
-    return this.encuestasService.update(id, body);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.encuestasService.remove(id);
+  async obtenerEncuesta(
+    @Param('id') id: number,
+    @Query() dto: ObtenerEncuestaDTO,
+  ): Promise<Encuesta> {
+    return await this.encuestasService.obtenerEncuesta(
+      id,
+      dto.codigo,
+      dto.tipo,
+    );
   }
 }

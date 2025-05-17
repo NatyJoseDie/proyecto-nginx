@@ -1,21 +1,19 @@
-import {
-  IsNumber,
-  IsArray,
-  IsOptional,
-  ValidateNested,
-  IsNotEmpty,
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { CreateRespuestaAbiertaDTO } from './create-respuesta-abierta.dto';
+import { CreateRespuestaOpcionDTO } from './create-respuesta-opcion.dto';
 
-export class CreateRespuestaDto {
-  @IsNumber()
-  encuestaId: number;
-
-  @IsOptional()
+export class CreateRespuestaDTO {
+  @ApiProperty({ type: [CreateRespuestaAbiertaDTO] })
   @IsArray()
-  respuestasAbiertas?: { preguntaId: number; texto: string }[];
+  @ValidateNested({ each: true })
+  @Type(() => CreateRespuestaAbiertaDTO)
+  respuestasAbiertas: CreateRespuestaAbiertaDTO[];
 
-  @IsOptional()
+  @ApiProperty({ type: [CreateRespuestaOpcionDTO] })
   @IsArray()
-  respuestasOpciones?: { preguntaId: number; opcionId: number }[];
+  @ValidateNested({ each: true })
+  @Type(() => CreateRespuestaOpcionDTO)
+  respuestasOpciones: CreateRespuestaOpcionDTO[];
 }

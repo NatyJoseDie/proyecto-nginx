@@ -1,61 +1,90 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Encuesta } from '../entities/encuesta.entity';
-import { CreateEncuestaDto } from '../dtos/create-encuesta.dto';
-import { UpdateEncuestaDto } from '../dtos/update-encuesta.dto';
-import { v4 as uuidv4 } from 'uuid';
+import { CodigoTipoEnum } from '../enums/codigo-tipo.enum';
+import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class EncuestasService {
   constructor(
     @InjectRepository(Encuesta)
-    private readonly encuestaRepository: Repository<Encuesta>,
+    private encuestasRepository: Repository<Encuesta>,
   ) {}
 
-  async findAll() {
-    return await this.encuestaRepository.find();
+  async crearEncuesta(dto: CreateEncuestaDTO): Promise<{
+    id: number;
+    codigoRespuesta: string;
+    codigoResultados: string;
+  }> {
+    const encuesta: Encuesta = this.encuestasRepository.create({
+      ...dto,
+      codigoRespuesta: v4(),
+      codigoResultados: v4(),
+    });
+
+    const encuestaGuardada = await this.encuestasRepository.save(encuesta);
+    return {
+      id: encuestaGuardada.id,
+      codigoRespuesta: encuestaGuardada.codigoRespuesta,
+      codigoResultados: encuestaGuardada.codigoResultados,
+    };
   }
 
-  async findOne(id: number) {
-    const encuesta = await this.encuestaRepository.findOne({ where: { id } });
+  async obtenerEncuesta(
+    id: number,
+    codigo: string,
+    codigoTipo: CodigoTipoEnum.RESPUESTA | CodigoTipoEnum.RESULTADOS,
+  ): Promise<Encuesta> {
+    let query: SelectQueryBuilder<Encuesta>;
+
+    switch (codigoTipo) {
+      case CodigoTipoEnum.RESPUESTA:
+        query = this.encuestasRepository
+          .createQueryBuilder('encuesta')
+          .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
+          .leftJoinAndSelect('pregunta.opciones', 'preguntaOpcion')
+          .where('encuesta.id = :id', { id });
+        query.andWhere('encuesta.codigoRespuesta = :codigo', { codigo });
+        query.orderBy('pregunta.numero', 'ASC');
+        query.addOrderBy('preguntaOpcion.numero', 'ASC');
+        break;
+      case CodigoTipoEnum.RESULTADOS:
+        query = this.encuestasRepository
+          .createQueryBuilder('encuesta')
+          .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
+          .leftJoinAndSelect('pregunta.opciones', 'preguntaOpcion')
+          .innerJoinAndSelect('encuesta.respuestas', 'respuesta')
+          .leftJoinAndSelect(
+            'respuesta.respuestasOpciones',
+            'preguntaRespuestaOpcion',
+          )
+          .leftJoinAndSelect(
+            'preguntaRespuestaOpcion.opcion',
+            'respuestaOpcionOpcion',
+          )
+          .leftJoinAndSelect(
+            'respuesta.respuestasAbiertas',
+            'preguntaRespuestaAbierta',
+          )
+          .leftJoinAndSelect(
+            'preguntaRespuestaAbierta.pregunta',
+            'respuestaAbiertaPregunta',
+          )
+          .where('encuesta.id = :id', { id });
+        query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
+        break;
+    }
+
+    console.log('QUERY:', query.getSql());
+    console.log('PARAMS:', query.getParameters());
+
+    const encuesta = await query.getOne();
+
     if (!encuesta) {
-      throw new NotFoundException(`Encuesta con ID ${id} no encontrada`);
+      throw new BadRequestException('Datos de encuesta no válidos');
     }
     return encuesta;
-  }
-
-  async create(createEncuestaDto: CreateEncuestaDto) {
-    const nuevaEncuesta = this.encuestaRepository.create({
-      ...createEncuestaDto,
-      codigoRespuesta: uuidv4(),
-      codigoResultados: uuidv4(),
-    });
-    return await this.encuestaRepository.save(nuevaEncuesta);
-  }
-
-  async obtenerPorCodigoRespuesta(codigo: string) {
-    return await this.encuestaRepository.findOne({
-      where: { codigoRespuesta: codigo },
-      relations: ['preguntas', 'preguntas.opciones'],
-    });
-  }
-
-  async obtenerPorCodigoResultados(codigo: string) {
-    return await this.encuestaRepository.findOne({
-      where: { codigoResultados: codigo },
-      relations: ['preguntas', 'preguntas.opciones', 'respuestas'],
-    });
-  }
-
-  async update(id: number, updateEncuestaDto: UpdateEncuestaDto) {
-    const encuesta = await this.findOne(id);
-    this.encuestaRepository.merge(encuesta, updateEncuestaDto);
-    return await this.encuestaRepository.save(encuesta);
-  }
-
-  async remove(id: number) {
-    const encuesta = await this.findOne(id);
-    return await this.encuestaRepository.remove(encuesta);
   }
 }
