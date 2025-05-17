@@ -12,6 +12,12 @@ import { RespuestasController } from './controllers/respuestas.controller';
 import { RespuestasService } from './services/respuestas.service';
 
 @Module({
+<<<<<<< HEAD
+  imports: [TypeOrmModule.forFeature([Pregunta, Opcion, Encuesta])],
+  controllers: [PreguntasController, EncuestasController],
+  providers: [PreguntasService, EncuestasService],
+  exports: [PreguntasService, EncuestasService],
+=======
   imports: [
     TypeOrmModule.forFeature([
       Encuesta,
@@ -27,5 +33,6 @@ import { RespuestasService } from './services/respuestas.service';
   providers: [EncuestasService, RespuestasService],
   //objetos de una clase que el framework va a dejar disponible para que se pueda inyectar
   // imports: []
+>>>>>>> leandro
 })
 export class EncuestasModule {}
