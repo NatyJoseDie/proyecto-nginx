@@ -1,31 +1,37 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsString,
+  IsArray,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
-  IsEnum,
-  IsArray,
   IsOptional,
-  IsBoolean,
+  IsString,
+  ValidateNested,
 } from 'class-validator';
-import { TipoRespuesta } from '../enums/tipo-respuesta.enum';
+import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
+import { CreateOpcionDTO } from './create-opcion.dto';
+import { Type } from 'class-transformer';
 
-export class CreatePreguntaDto {
+export class CreatePreguntaDTO {
+  @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
   numero: number;
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   texto: string;
 
-  @IsEnum(TipoRespuesta)
-  tipoRespuesta: TipoRespuesta;
+  @ApiProperty({ enum: TiposRespuestaEnum })
+  @IsEnum(TiposRespuestaEnum)
+  @IsNotEmpty()
+  tipo: TiposRespuestaEnum;
 
-  @IsOptional()
-  @IsBoolean()
-  seleccionMultiple?: boolean;
-
-  @IsOptional()
+  @ApiProperty({ type: [CreateOpcionDTO], required: false })
   @IsArray()
-  opciones?: string[];
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => CreateOpcionDTO)
+  opciones?: CreateOpcionDTO[];
 }

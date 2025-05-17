@@ -1,10 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pregunta } from '../entities/pregunta.entity';
-import { CreatePreguntaDto } from '../dtos/create-pregunta.dto';
+import { CreatePreguntaDTO } from '../dtos/create-pregunta.dto';
 import { UpdatePreguntaDto } from '../dtos/update-pregunta.dto';
 import { Opcion } from '../entities/opcion.entity';
+import { CreateOpcionDTO } from '../dtos/create-opcion.dto';
+import { error } from 'console';
 
 @Injectable()
 export class PreguntasService {
@@ -32,7 +39,7 @@ export class PreguntasService {
     return pregunta;
   }
 
-  async create(createPreguntaDto: CreatePreguntaDto) {
+  async create(createPreguntaDto: CreatePreguntaDTO) {
     const { opciones, ...preguntaData } = createPreguntaDto;
 
     // Crear la pregunta sin opciones primero
@@ -40,8 +47,13 @@ export class PreguntasService {
     const preguntaGuardada = await this.preguntaRepository.save(nuevaPregunta);
 
     // Si se proporcionan opciones, crearlas por separado
+    let opcionesEntities: { texto: CreateOpcionDTO; pregunta: Pregunta }[];
     if (opciones && opciones.length > 0) {
+<<<<<<< HEAD
       const opcionesEntities = opciones.map((texto) => {
+=======
+      opcionesEntities = opciones.map((texto) => {
+>>>>>>> leandro
         return {
           texto,
           pregunta: preguntaGuardada,
@@ -49,7 +61,11 @@ export class PreguntasService {
       });
 
       // Guardar opciones con referencia a la pregunta
-      await this.opcionRepository.save(opcionesEntities);
+      // await this.opcionRepository.save(opcionesEntities);
+      throw new HttpException(
+        'Chequear metodo , error de tipos',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     return this.findOne(preguntaGuardada.id);
@@ -74,10 +90,13 @@ export class PreguntasService {
           texto,
           pregunta,
         }));
-        await this.opcionRepository.save(opcionesEntities);
+        // await this.opcionRepository.save(opcionesEntities);
       }
     }
-
+    throw new HttpException(
+      'Chequear metodo , error de tipos',
+      HttpStatus.BAD_REQUEST,
+    );
     return this.findOne(id);
   }
 
