@@ -13,6 +13,7 @@ import { RespuestaAbierta } from './modules/encuestas/entities/respuesta-abierta
 @Module({
   imports: [
     EncuestasModule,
+
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true,

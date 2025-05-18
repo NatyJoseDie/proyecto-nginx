@@ -10,15 +10,6 @@ import { Encuesta } from '../entities/encuesta.entity';
 export class EncuestasController {
   constructor(private encuestasService: EncuestasService) {}
 
-  @Post()
-  async crearEncuesta(@Body() dto: CreateEncuestaDTO): Promise<{
-    id: number;
-    codigoRespuesta: string;
-    codigoResultados: string;
-  }> {
-    return await this.encuestasService.crearEncuesta(dto);
-  }
-
   @Get(':id')
   async obtenerEncuesta(
     @Param('id') id: number,
@@ -29,6 +20,15 @@ export class EncuestasController {
       dto.codigo,
       dto.tipo,
     );
+  }
+
+  @Post()
+  async crearEncuesta(@Body() dto: CreateEncuestaDTO): Promise<{
+    id: number;
+    codigoRespuesta: string;
+    codigoResultados: string;
+  }> {
+    return await this.encuestasService.crearEncuesta(dto);
   }
   @Post('seed')
   async seedEncuesta() {

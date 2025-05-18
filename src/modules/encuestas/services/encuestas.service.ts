@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Encuesta } from '../entities/encuesta.entity';
@@ -6,6 +11,7 @@ import { CodigoTipoEnum } from '../enums/codigo-tipo.enum';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 import { v4 } from 'uuid';
 import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
+import { Pregunta } from '../entities/pregunta.entity';
 
 @Injectable()
 export class EncuestasService {
@@ -89,43 +95,34 @@ export class EncuestasService {
     return encuesta;
   }
   async seedDb() {
-    // const queryBuilder = this.encuestasRepository.createQueryBuilder();
-
+    const queryBuilder = this.encuestasRepository.createQueryBuilder();
+    const encuestasRaw = [
+      {
+        nombre: 'encuesta',
+        preguntas: [
+          { tipo: 'ABIERTA', texto: 'Que lenguajes de programacion manejas ' },
+        ],
+      },
+    ];
     const encuesta: Encuesta = new Encuesta();
+    const pregunta: Pregunta = new Pregunta();
+    Object.assign(pregunta, {
+      tipo: 'ABIERTA',
+      numero: 1,
+      texto: 'Que lenguajes de programacion manejas 678?',
+    });
     Object.assign(encuesta, {
       nombre: 'encuesta batch test',
       codigoRespuesta: v4(),
       codigoResultados: v4(),
-      preguntas: [
-        {
-          tipo: 'ABIERTA',
-          numero: 1,
-          texto: 'Que lenguajes de programacion manejas 678?',
-        },
-      ],
+      preguntas: [pregunta],
     });
     const encuestas: Encuesta[] = [encuesta];
-    for (const encuesta of encuestas) {
-      console.log('current e', encuesta);
-      return await this.encuestasRepository.save(encuesta);
-    }
-    // return await queryBuilder
-    //   .insert()
-    //   .into(Encuesta)
-    //   .values([
-    //     {
-    //       nombre: `Encuesta`,
-    //       codigoRespuesta: v4(),
-    //       codigoResultados: v4(),
-    //       preguntas: [
-    //         {
-    //           tipo: TiposRespuestaEnum.ABIERTA,
-    //           numero: 1,
-    //           texto: 'Que lenguajes de programacion manejas ?',
-    //         },
-    //       ],
-    //     },
-    //   ])
-    //   .execute();
+
+    return await queryBuilder
+      .insert()
+      .into(Encuesta)
+      .values(encuestas)
+      .execute();
   }
 }

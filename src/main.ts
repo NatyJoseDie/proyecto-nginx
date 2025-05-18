@@ -28,9 +28,7 @@ async function bootstrap() {
   });
 
   //verificar que el objeto tenga las propiedades que queremos, restringe los objetos que recibe la app
-  app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
-  );
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   //cuando se retorna un objeto por ej no devuelva contraseñas
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
