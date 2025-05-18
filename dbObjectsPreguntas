@@ -1,0 +1,9 @@
+
+/////////
+{ "tipo" : "OPCION_MULTIPLE_SELECCION_SIMPLE" ,"numero" :2  , "texto" : "Cual de estos lenguajes conoces ?" , "opciones" : [{
+			 "id":"1" ,"numero":1, "texto":"javascript" ,"id_pregunta":2
+		 } ,{
+			 "id":"2" ,"numero":2, "texto":"python" ,"id_pregunta":2
+		 } ]
+		 }
+///////////		 

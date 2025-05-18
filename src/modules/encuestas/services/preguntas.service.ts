@@ -12,6 +12,7 @@ import { UpdatePreguntaDTO } from '../dtos/update-pregunta.dto';
 import { Opcion } from '../entities/opcion.entity';
 import { CreateOpcionDTO } from '../dtos/create-opcion.dto';
 import { error } from 'console';
+import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
 
 @Injectable()
 export class PreguntasService {
@@ -40,6 +41,12 @@ export class PreguntasService {
   }
 
   async create(createPreguntaDto: CreatePreguntaDTO) {
+    if (createPreguntaDto.tipo === TiposRespuestaEnum.ABIERTA) {
+      delete createPreguntaDto.opciones;
+    }
+    return await this.preguntaRepository.save(createPreguntaDto);
+  }
+  /*   async create(createPreguntaDto: CreatePreguntaDTO) {
     const { opciones, ...preguntaData } = createPreguntaDto;
 
     // Crear la pregunta sin opciones primero
@@ -49,7 +56,7 @@ export class PreguntasService {
     // Si se proporcionan opciones, crearlas por separado
 
     if (opciones && opciones.length > 0) {
-      const opcionesEntities = opciones.map((texto) => {
+      const opcionesEntities  = opciones.map((texto) => {
         return {
           texto,
           pregunta: preguntaGuardada,
@@ -57,15 +64,11 @@ export class PreguntasService {
       });
 
       // Guardar opciones con referencia a la pregunta
-      // await this.opcionRepository.save(opcionesEntities);
-      throw new HttpException(
-        'Chequear metodo , error de tipos',
-        HttpStatus.BAD_REQUEST,
-      );
+       await this.opcionRepository.save(opcionesEntities);
     }
 
     return this.findOne(preguntaGuardada.id);
-  }
+  } */
 
   async update(id: number, updatePreguntaDto: UpdatePreguntaDTO) {
     const pregunta = await this.findOne(id);
