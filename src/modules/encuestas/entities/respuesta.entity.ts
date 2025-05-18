@@ -15,9 +15,10 @@ export class Respuesta {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Encuesta)
+  @ManyToOne(() => Encuesta, (encuesta) => encuesta.respuestas, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'id_encuesta' })
-  @Exclude()
   encuesta: Encuesta;
 
   @OneToMany(
