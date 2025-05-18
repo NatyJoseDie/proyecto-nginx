@@ -10,8 +10,7 @@ import { Pregunta } from '../entities/pregunta.entity';
 import { CreatePreguntaDTO } from '../dtos/create-pregunta.dto';
 import { UpdatePreguntaDTO } from '../dtos/update-pregunta.dto';
 import { Opcion } from '../entities/opcion.entity';
-import { CreateOpcionDTO } from '../dtos/create-opcion.dto';
-import { error } from 'console';
+
 import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
 
 @Injectable()
@@ -44,7 +43,7 @@ export class PreguntasService {
     if (createPreguntaDto.tipo === TiposRespuestaEnum.ABIERTA) {
       delete createPreguntaDto.opciones;
     }
-    return await this.preguntaRepository.save(createPreguntaDto);
+    return (await this.preguntaRepository.save(createPreguntaDto)) as Pregunta;
   }
   /*   async create(createPreguntaDto: CreatePreguntaDTO) {
     const { opciones, ...preguntaData } = createPreguntaDto;
@@ -71,9 +70,23 @@ export class PreguntasService {
   } */
 
   async update(id: number, updatePreguntaDto: UpdatePreguntaDTO) {
+    if (updatePreguntaDto.tipo === TiposRespuestaEnum.ABIERTA) {
+      delete updatePreguntaDto.opciones;
+    }
+    const pregunta = await this.findOne(id);
+    console.log('preg', pregunta);
+    if (!pregunta) {
+      throw new HttpException('No se encontro preguntas', HttpStatus.NOT_FOUND);
+    }
+    return await this.preguntaRepository.save({
+      ...pregunta,
+      ...updatePreguntaDto,
+    });
+  }
+  /* async update(id: number, updatePreguntaDto: UpdatePreguntaDTO) {
     const pregunta = await this.findOne(id);
     const { opciones, ...preguntaData } = updatePreguntaDto;
-
+ 
     // Actualizar los datos de la pregunta
     this.preguntaRepository.merge(pregunta, preguntaData);
     await this.preguntaRepository.save(pregunta);
@@ -89,15 +102,12 @@ export class PreguntasService {
           texto,
           pregunta,
         }));
-        // await this.opcionRepository.save(opcionesEntities);
+        await this.opcionRepository.save(opcionesEntities);
       }
     }
-    throw new HttpException(
-      'Chequear metodo , error de tipos',
-      HttpStatus.BAD_REQUEST,
-    );
+ 
     return this.findOne(id);
-  }
+  } */
 
   async remove(id: number) {
     const pregunta = await this.findOne(id);

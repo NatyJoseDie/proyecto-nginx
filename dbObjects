@@ -15,3 +15,16 @@
 		]
 	}
 //////////
+/////////
+{
+		
+		"nombre": "encuesta 2",
+	"preguntas" : [
+		    { "tipo" : "ABIERTA" ,"numero" :1  , "texto" : "Que carreras estas cursando ?"},
+		 { "tipo" : "ABIERTA" ,"numero" :1  , "texto" : "Que materias es tu favorita ?"},
+			 { "tipo" : "ABIERTA" ,"numero" :1  , "texto" : "Que año estas cursando ?"}
+	
+	
+		]
+	}
+//////

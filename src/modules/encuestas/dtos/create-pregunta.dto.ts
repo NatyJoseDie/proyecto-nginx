@@ -5,9 +5,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
-  IsOptional,
   IsString,
-  MinLength,
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
@@ -32,8 +30,7 @@ export class CreatePreguntaDTO {
   tipo: TiposRespuestaEnum;
 
   @ApiProperty({ type: [CreateOpcionDTO], required: false })
-  @ValidateIf((obj) => {
-    console.log('obj', obj);
+  @ValidateIf((obj: { tipo: TiposRespuestaEnum }) => {
     return (
       obj.tipo === TiposRespuestaEnum.OPCION_MULTIPLE_SELECCION_MULTIPLE ||
       obj.tipo === TiposRespuestaEnum.OPCION_MULTIPLE_SELECCION_SIMPLE
