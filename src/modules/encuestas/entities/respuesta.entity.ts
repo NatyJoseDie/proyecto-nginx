@@ -26,6 +26,7 @@ export class Respuesta {
     (respuestaOpcion) => respuestaOpcion.respuesta,
     {
       cascade: ['insert'],
+      eager: true,
     },
   )
   respuestasOpciones: RespuestaOpcion[];
@@ -35,7 +36,12 @@ export class Respuesta {
     (respuestaAbierta) => respuestaAbierta.respuesta,
     {
       cascade: ['insert'],
+      eager: true,
     },
   )
   respuestasAbiertas: RespuestaAbierta[];
+  // @AfterLoad()
+  // methodTest() {
+  //   this.id += 9000;
+  // }
 }

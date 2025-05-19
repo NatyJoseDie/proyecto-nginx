@@ -10,7 +10,7 @@ import { Encuesta } from '../entities/encuesta.entity';
 import { CodigoTipoEnum } from '../enums/codigo-tipo.enum';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 import { v4 } from 'uuid';
-import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
+// import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
 import { Pregunta } from '../entities/pregunta.entity';
 
 @Injectable()
@@ -44,6 +44,14 @@ export class EncuestasService {
     codigo: string,
     codigoTipo: CodigoTipoEnum.RESPUESTA | CodigoTipoEnum.RESULTADOS,
   ): Promise<Encuesta> {
+    const e = await this.encuestasRepository.findOne({
+      where: { id },
+      relations: ['respuestas'],
+    });
+    if (!e) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
+    return e;
     let query: SelectQueryBuilder<Encuesta>;
 
     switch (codigoTipo) {
@@ -81,29 +89,30 @@ export class EncuestasService {
           )
           .where('encuesta.id = :id', { id });
         query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
+
         break;
     }
 
     console.log('QUERY:', query.getSql());
     console.log('PARAMS:', query.getParameters());
 
-    const encuesta = await query.getOne();
-
-    if (!encuesta) {
-      throw new BadRequestException('Datos de encuesta no válidos');
-    }
-    return encuesta;
+    // const encuesta = await query.getOne();
+    // console.log('here');
+    // if (!encuesta) {
+    //   throw new BadRequestException('Datos de encuesta no válidos');
+    // }
+    // return encuesta;
   }
   async seedDb() {
     const queryBuilder = this.encuestasRepository.createQueryBuilder();
-    const encuestasRaw = [
-      {
-        nombre: 'encuesta',
-        preguntas: [
-          { tipo: 'ABIERTA', texto: 'Que lenguajes de programacion manejas ' },
-        ],
-      },
-    ];
+    // const encuestasRaw = [
+    //   {
+    //     nombre: 'encuesta',
+    //     preguntas: [
+    //       { tipo: 'ABIERTA', texto: 'Que lenguajes de programacion manejas ' },
+    //     ],
+    //   },
+    // ];
     const encuesta: Encuesta = new Encuesta();
     const pregunta: Pregunta = new Pregunta();
     Object.assign(pregunta, {
