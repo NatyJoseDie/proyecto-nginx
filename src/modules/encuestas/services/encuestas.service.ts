@@ -44,14 +44,14 @@ export class EncuestasService {
     codigo: string,
     codigoTipo: CodigoTipoEnum.RESPUESTA | CodigoTipoEnum.RESULTADOS,
   ): Promise<Encuesta> {
-    const e = await this.encuestasRepository.findOne({
-      where: { id },
-      relations: ['respuestas'],
-    });
-    if (!e) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-    }
-    return e;
+    // const e = await this.encuestasRepository.findOne({
+    //   where: { id },
+    //   relations: ['respuestas'],
+    // });
+    // if (!e) {
+    //   throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    // }
+    // return e;
     let query: SelectQueryBuilder<Encuesta>;
 
     switch (codigoTipo) {
@@ -96,12 +96,12 @@ export class EncuestasService {
     console.log('QUERY:', query.getSql());
     console.log('PARAMS:', query.getParameters());
 
-    // const encuesta = await query.getOne();
-    // console.log('here');
-    // if (!encuesta) {
-    //   throw new BadRequestException('Datos de encuesta no válidos');
-    // }
-    // return encuesta;
+    const encuesta = await query.getOne();
+    console.log('here');
+    if (!encuesta) {
+      throw new BadRequestException('Datos de encuesta no válidos');
+    }
+    return encuesta;
   }
   async seedDb() {
     const queryBuilder = this.encuestasRepository.createQueryBuilder();
