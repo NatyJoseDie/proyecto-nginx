@@ -1,5 +1,4 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Exclude, Expose } from 'class-transformer';
 
 import { Opcion } from './opcion.entity';
 import { Respuesta } from './respuesta.entity';

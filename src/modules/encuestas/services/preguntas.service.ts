@@ -74,9 +74,9 @@ export class PreguntasService {
       delete updatePreguntaDto.opciones;
     }
     const pregunta = await this.findOne(id);
-    console.log('preg', pregunta);
+
     if (!pregunta) {
-      throw new HttpException('No se encontro preguntas', HttpStatus.NOT_FOUND);
+      throw new HttpException('No se encontro pregunta', HttpStatus.NOT_FOUND);
     }
     return await this.preguntaRepository.save({
       ...pregunta,

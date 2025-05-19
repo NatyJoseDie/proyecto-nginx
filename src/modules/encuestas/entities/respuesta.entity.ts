@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Exclude } from 'class-transformer';
+
 import { Encuesta } from './encuesta.entity';
 import { RespuestaOpcion } from './respuesta-opcion.entity';
 import { RespuestaAbierta } from './respuesta-abierta.entity';

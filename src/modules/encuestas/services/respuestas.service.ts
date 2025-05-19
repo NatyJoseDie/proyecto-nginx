@@ -32,7 +32,7 @@ export class RespuestasService {
 
     await this.respuestaRepository.save(respuesta);
     return {
-      mensaje: 'Encuesta enviada',
+      mensaje: 'Respuesta enviada',
     };
   }
 }
