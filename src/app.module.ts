@@ -9,8 +9,10 @@ import { Opcion } from './modules/encuestas/entities/opcion.entity';
 import { Respuesta } from './modules/encuestas/entities/respuesta.entity';
 import { RespuestaOpcion } from './modules/encuestas/entities/respuesta-opcion.entity';
 import { RespuestaAbierta } from './modules/encuestas/entities/respuesta-abierta.entity';
+import { ValidateAnswerPipe } from './pipes/validate-answer/validate-answer.pipe';
 
 @Module({
+  providers: [ValidateAnswerPipe],
   imports: [
     EncuestasModule,
 
@@ -40,8 +42,8 @@ import { RespuestaAbierta } from './modules/encuestas/entities/respuesta-abierta
         // Esto puede modificar la BD sin consultar, se cambió a false
         synchronize: true, // Cambiado a true para desarrollo
         autoLoadEntities: true,
-        logging: configService.get('database.logging'),
-        logger: configService.get('database.logger'),
+        // logging: configService.get('database.logging'),
+        // logger: configService.get('database.logger'),
       }),
     }),
   ],

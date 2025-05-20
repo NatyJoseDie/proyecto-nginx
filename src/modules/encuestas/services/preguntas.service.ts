@@ -12,6 +12,7 @@ import { UpdatePreguntaDTO } from '../dtos/update-pregunta.dto';
 import { Opcion } from '../entities/opcion.entity';
 
 import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
+import { Encuesta } from '../entities/encuesta.entity';
 
 @Injectable()
 export class PreguntasService {
@@ -20,6 +21,8 @@ export class PreguntasService {
     private readonly preguntaRepository: Repository<Pregunta>,
     @InjectRepository(Opcion)
     private readonly opcionRepository: Repository<Opcion>,
+    @InjectRepository(Encuesta)
+    private readonly encuestaRepository: Repository<Encuesta>,
   ) {}
 
   async findAll() {
@@ -108,7 +111,17 @@ export class PreguntasService {
  
     return this.findOne(id);
   } */
+  async getPreguntaByQuery(preguntaId: number, encuestaId: number) {
+    console.log(encuestaId);
+    console.log(preguntaId);
+    const query = this.preguntaRepository
+      .createQueryBuilder('pregunta')
+      .where('pregunta.id = :preguntaId', { preguntaId })
+      .leftJoinAndSelect('pregunta.encuesta', 'encuesta')
+      .andWhere('encuesta.id = :encuestaId', { encuestaId });
 
+    return await query.getOne();
+  }
   async remove(id: number) {
     const pregunta = await this.findOne(id);
     return await this.preguntaRepository.remove(pregunta);

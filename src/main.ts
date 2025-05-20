@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
+import { ValidateAnswerPipe } from './pipes/validate-answer/validate-answer.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

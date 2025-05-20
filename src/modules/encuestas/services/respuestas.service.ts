@@ -20,7 +20,7 @@ export class RespuestasService {
   ) {}
 
   async crearRespuesta(
-    dto: CreateRespuestaDTO,
+    dto: { texto: string; idPregunta: number },
     idEncuesta: number,
   ): Promise<{
     mensaje: string;

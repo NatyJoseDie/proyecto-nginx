@@ -28,7 +28,6 @@ export class Pregunta {
 
   @ManyToOne(() => Encuesta)
   @JoinColumn({ name: 'id_encuesta' })
-  @Exclude()
   encuesta: Encuesta;
 
   @OneToMany(() => Opcion, (opcion) => opcion.pregunta, {
