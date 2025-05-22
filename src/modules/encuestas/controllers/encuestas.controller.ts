@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Patch,
+} from '@nestjs/common';
 import { EncuestasService } from '../services/encuestas.service';
 import { CreateEncuestaDto } from '../dtos/create-encuesta.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -35,6 +43,7 @@ export class EncuestasController {
 
   @Patch(':id')
   update(@Param('id') id: number, @Body() body: any) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return this.encuestasService.update(id, body);
   }
 
