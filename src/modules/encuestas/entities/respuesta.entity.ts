@@ -9,6 +9,7 @@ import {
 import { Encuesta } from './encuesta.entity';
 import { RespuestaOpcion } from './respuesta-opcion.entity';
 import { RespuestaAbierta } from './respuesta-abierta.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'respuestas' })
 export class Respuesta {
@@ -29,6 +30,7 @@ export class Respuesta {
       eager: true,
     },
   )
+  @Exclude()
   respuestasOpciones: RespuestaOpcion[];
 
   @OneToMany(
@@ -39,6 +41,7 @@ export class Respuesta {
       eager: true,
     },
   )
+  @Exclude()
   respuestasAbiertas: RespuestaAbierta[];
   // @AfterLoad()
   // methodTest() {

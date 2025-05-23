@@ -19,20 +19,14 @@ export class RespuestasService {
     private respuestaRepository: Repository<Respuesta>,
   ) {}
 
-  async crearRespuesta(
-    dto: { texto: string; idPregunta: number },
-    idEncuesta: number,
-  ): Promise<{
-    mensaje: string;
-  }> {
-    const respuesta: Respuesta = this.respuestaRepository.create({
-      encuesta: { id: idEncuesta },
-      ...dto,
-    });
+  async crearRespuesta(dto: CreateRespuestaDTO, idEncuesta: number) {
+    // const respuesta: Respuesta = this.respuestaRepository.create({
+    //   encuesta: { id: idEncuesta },
+    //   ...dto,
+    // });
+    const respuesta = new Respuesta();
+    Object.assign(respuesta, dto);
 
-    await this.respuestaRepository.save(respuesta);
-    return {
-      mensaje: 'Respuesta enviada',
-    };
+    return await this.respuestaRepository.save(respuesta);
   }
 }

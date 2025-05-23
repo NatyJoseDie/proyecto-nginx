@@ -120,7 +120,11 @@ export class PreguntasService {
       .leftJoinAndSelect('pregunta.encuesta', 'encuesta')
       .andWhere('encuesta.id = :encuestaId', { encuestaId });
 
-    return await query.getOne();
+    const pregunta: Pregunta | null = await query.getOne();
+    if (!pregunta) {
+      throw new HttpException('No se encontro pregunta', HttpStatus.NOT_FOUND);
+    }
+    return pregunta;
   }
   async remove(id: number) {
     const pregunta = await this.findOne(id);
