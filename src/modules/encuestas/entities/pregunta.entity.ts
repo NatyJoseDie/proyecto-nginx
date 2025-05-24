@@ -33,6 +33,7 @@ export class Pregunta {
 
   @OneToMany(() => Opcion, (opcion) => opcion.pregunta, {
     cascade: ['insert', 'remove'],
+    eager: true,
   })
   opciones: Opcion[];
 

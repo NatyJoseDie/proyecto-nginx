@@ -34,16 +34,39 @@ export class RespuestasController {
       Number(idPregunta),
       Number(idEncuesta),
     );
-
-    if (pregunta.tipo === TiposRespuestaEnum.ABIERTA) {
-      return await this.respuestasService.crearRespuesta(respuesta, idEncuesta);
+    if (!pregunta) {
+      throw new HttpException('Pregunta no encontrada ', HttpStatus.NOT_FOUND);
     }
-    // if (
-    //   pregunta.tipo === TiposRespuestaEnum.OPCION_MULTIPLE_SELECCION_MULTIPLE ||
-    //   pregunta.tipo === TiposRespuestaEnum.OPCION_MULTIPLE_SELECCION_SIMPLE
-    // ) {
-    //   console.log('multiple choice');
-    // }
+    if (pregunta.tipo === TiposRespuestaEnum.ABIERTA) {
+      return await this.respuestasService.createRespuestaAbierta(
+        respuesta,
+        idEncuesta,
+      );
+    }
+
+    if (
+      pregunta.tipo === TiposRespuestaEnum.OPCION_MULTIPLE_SELECCION_MULTIPLE ||
+      pregunta.tipo === TiposRespuestaEnum.OPCION_MULTIPLE_SELECCION_SIMPLE
+    ) {
+      console.log('in');
+      const preguntaOpcion = pregunta.opciones.find(
+        (el) => el.texto === respuesta.texto,
+      );
+      console.log('Opcion', preguntaOpcion);
+      console.log(pregunta);
+      if (!preguntaOpcion) {
+        throw new HttpException(
+          'Opcion pregunta no valida',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      }
+      return await this.respuestasService.createRespuestaCerrada(
+        respuesta,
+        pregunta.id,
+        idEncuesta,
+        preguntaOpcion,
+      );
+    }
   }
 
   // @Post(':idEncuesta')
@@ -53,6 +76,6 @@ export class RespuestasController {
   // ): Promise<{
   //   mensaje: string;
   // }> {
-  //   return await this.respuestasService.crearRespuesta(dto, idEncuesta);
+  //   return await this.respuestasService.createRespuestaAbierta(dto, idEncuesta);
   // }
 }

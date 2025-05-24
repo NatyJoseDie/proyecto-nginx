@@ -28,3 +28,17 @@
 		]
 	}
 //////
+
+{
+		
+		"nombre": "encuesta ",
+	"preguntas" : [
+		    { "tipo" : "ABIERTA" ,"numero" :1  , "texto" : "Que carreras estas cursando ?"},
+		 { "tipo" : "ABIERTA" ,"numero" :2  , "texto" : "Que materias es tu favorita ?"},
+			 { "tipo" : "ABIERTA" ,"numero" :3  , "texto" : "Que año estas cursando ?"},
+ { "tipo" : "OPCION_MULTIPLE_SELECCION_SIMPLE" ,"numero" :4  , "texto" : "Que te gusta mas ? ", "opciones" :  [{ "numero" : 1 , "texto":"Font End"} , { "numero" : 2 , "texto":"Back End"}] }
+	
+	
+	
+		]
+	}

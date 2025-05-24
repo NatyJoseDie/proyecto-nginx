@@ -18,7 +18,7 @@ export class RespuestaAbierta {
   @Column()
   texto: string;
 
-  @ManyToOne(() => Pregunta)
+  @ManyToOne(() => Pregunta, { cascade: ['insert'] })
   @JoinColumn({ name: 'id_pregunta' })
   @Exclude()
   pregunta: Pregunta;
@@ -28,7 +28,9 @@ export class RespuestaAbierta {
     return this.pregunta?.id;
   }
 
-  @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasAbiertas)
+  @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasAbiertas, {
+    cascade: ['insert'],
+  })
   @JoinColumn({ name: 'id_respuesta' })
   @Exclude()
   respuesta: Respuesta;

@@ -10,6 +10,7 @@ export class RespuestaOpcion {
 
   @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasOpciones, {
     onDelete: 'CASCADE',
+    cascade: ['insert'],
   })
   @JoinColumn({ name: 'id_respuesta' })
   respuesta: Respuesta;

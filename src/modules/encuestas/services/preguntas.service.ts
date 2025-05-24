@@ -118,8 +118,9 @@ export class PreguntasService {
       .createQueryBuilder('pregunta')
       .where('pregunta.id = :preguntaId', { preguntaId })
       .leftJoinAndSelect('pregunta.encuesta', 'encuesta')
-      .andWhere('encuesta.id = :encuestaId', { encuestaId });
+      .leftJoinAndSelect('pregunta.opciones', 'opciones')
 
+      .andWhere('encuesta.id = :encuestaId', { encuestaId });
     const pregunta: Pregunta | null = await query.getOne();
     if (!pregunta) {
       throw new HttpException('No se encontro pregunta', HttpStatus.NOT_FOUND);
