@@ -6,6 +6,8 @@ import {
   HttpException,
   HttpStatus,
   ParseIntPipe,
+  UsePipes,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateRespuestaDTO } from '../dtos/create-respuesta.dto';
 import { RespuestasService } from '../services/respuestas.service';
@@ -13,6 +15,7 @@ import { RespuestasService } from '../services/respuestas.service';
 import { PreguntasService } from '../services/preguntas.service';
 
 import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
+import { ValidateAnswerInterceptor } from 'src/interceptors/validate-answer/validate-answer.interceptor';
 
 @Controller('/respuestas')
 export class RespuestasController {
@@ -22,14 +25,12 @@ export class RespuestasController {
   ) {}
 
   @Post(':idEncuesta/:idPregunta')
+  @UseInterceptors(ValidateAnswerInterceptor)
   async responderEncuesta(
     @Param('idEncuesta', ParseIntPipe) idEncuesta: number,
     @Param('idPregunta', ParseIntPipe) idPregunta: number,
     @Body() respuesta: CreateRespuestaDTO,
   ) {
-    console.log('id encuesta', idEncuesta);
-    console.log('id pregunta', idPregunta);
-    console.log('respuesta', respuesta);
     const pregunta = await this.preguntaService.getPreguntaByQuery(
       Number(idPregunta),
       Number(idEncuesta),
@@ -48,18 +49,17 @@ export class RespuestasController {
       pregunta.tipo === TiposRespuestaEnum.OPCION_MULTIPLE_SELECCION_MULTIPLE ||
       pregunta.tipo === TiposRespuestaEnum.OPCION_MULTIPLE_SELECCION_SIMPLE
     ) {
-      console.log('in');
       const preguntaOpcion = pregunta.opciones.find(
         (el) => el.texto === respuesta.texto,
       );
-      console.log('Opcion', preguntaOpcion);
-      console.log(pregunta);
+
       if (!preguntaOpcion) {
         throw new HttpException(
           'Opcion pregunta no valida',
           HttpStatus.UNPROCESSABLE_ENTITY,
         );
       }
+
       return await this.respuestasService.createRespuestaCerrada(
         respuesta,
         pregunta.id,

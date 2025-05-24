@@ -14,16 +14,19 @@ import { CreateRespuestaDTO } from '../dtos/create-respuesta.dto';
 import { Encuesta } from '../entities/encuesta.entity';
 import { RespuestaOpcion } from '../entities/respuesta-opcion.entity';
 import { Opcion } from '../entities/opcion.entity';
+import { RespuestaAbierta } from '../entities/respuesta-abierta.entity';
 
 @Injectable()
 export class RespuestasService {
   constructor(
     @InjectRepository(Respuesta)
-    private respuestaRepository: Repository<Respuesta>,
+    private readonly respuestaRepository: Repository<Respuesta>,
     @InjectRepository(Encuesta)
-    private encuestaRepository: Repository<Encuesta>,
+    private readonly encuestaRepository: Repository<Encuesta>,
     @InjectRepository(RespuestaOpcion)
-    private respuestaOpcionRepository: Repository<RespuestaOpcion>,
+    private readonly respuestaOpcionRepository: Repository<RespuestaOpcion>,
+    @InjectRepository(RespuestaAbierta)
+    private readonly respuestaAbiertaRepository: Repository<RespuestaAbierta>,
   ) {}
 
   async createRespuestaAbierta(dto: CreateRespuestaDTO, idEncuesta: number) {
@@ -53,36 +56,53 @@ export class RespuestasService {
     dto: CreateRespuestaDTO,
     idPregunta: number,
     idEncuesta: number,
-    respuestaOpcion: Opcion,
+    opcion: Opcion,
   ) {
-    try {
-      const encuesta = await this.encuestaRepository.findOneBy({
-        id: idEncuesta,
-      });
-      if (!encuesta) {
-        throw new HttpException('No existe encuesta', HttpStatus.NOT_FOUND);
-      }
+    const encuesta = await this.encuestaRepository.findOneBy({
+      id: idEncuesta,
+    });
+    const respuesta = new Respuesta();
+    Object.assign(respuesta, { encuesta });
+    const respuestaOpcion = new RespuestaOpcion();
+    Object.assign(respuestaOpcion, { respuesta, opcion });
 
-      const respuesta = new Respuesta();
-
-      Object.assign(respuesta, {
-        respuestasAbiertas: [dto.texto],
-        encuesta,
-        respuestasOpciones: [respuestaOpcion],
-      });
-      const savedRespuesta = await this.respuestaRepository.save(respuesta);
-
-      const respuestaCerrada = new RespuestaOpcion();
-      Object.assign(respuestaCerrada, {
-        texto: dto.texto,
-        id_pregunta: idPregunta,
-        id_respuesta: savedRespuesta.id,
-        id_opcion: respuesta.id,
-      });
-      return await this.respuestaOpcionRepository.save(respuestaCerrada);
-    } catch (error) {
-      console.log('in error', error);
-      throw new HttpException('Server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    if (!encuesta) {
+      throw new HttpException('No existe encuesta', HttpStatus.NOT_FOUND);
     }
+    return await this.respuestaOpcionRepository.save(respuestaOpcion);
   }
+  // async createRespuestaCerrada(
+  //   dto: CreateRespuestaDTO,
+  //   idPregunta: number,
+  //   idEncuesta: number,
+  //   respuestaOpcion: Opcion,
+  // ) {
+  //   try {
+  //     const encuesta = await this.encuestaRepository.findOneBy({
+  //       id: idEncuesta,
+  //     });
+  //     if (!encuesta) {
+  //       throw new HttpException('No existe encuesta', HttpStatus.NOT_FOUND);
+  //     }
+
+  //     const respuesta = new Respuesta();
+
+  //     Object.assign(respuesta, {
+  //       respuestasAbiertas: [],
+  //       encuesta,
+  //       respuestasOpciones: [respuestaOpcion],
+  //     });
+  //     const savedRespuesta = await this.respuestaRepository.save(respuesta);
+  //     console.log('saved rta', savedRespuesta);
+  //     const respuestaCerrada = new RespuestaOpcion();
+  //     Object.assign(respuestaCerrada, {
+  //       id_respuesta: savedRespuesta.id,
+  //       id_opcion: respuestaOpcion.id,
+  //     });
+  //     return await this.respuestaOpcionRepository.save(respuestaCerrada);
+  //   } catch (error) {
+  //     console.log('in error', error);
+  //     throw new HttpException('Server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
 }

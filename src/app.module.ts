@@ -9,10 +9,9 @@ import { Opcion } from './modules/encuestas/entities/opcion.entity';
 import { Respuesta } from './modules/encuestas/entities/respuesta.entity';
 import { RespuestaOpcion } from './modules/encuestas/entities/respuesta-opcion.entity';
 import { RespuestaAbierta } from './modules/encuestas/entities/respuesta-abierta.entity';
-import { ValidateAnswerPipe } from './pipes/validate-answer/validate-answer.pipe';
 
 @Module({
-  providers: [ValidateAnswerPipe],
+  providers: [],
   imports: [
     EncuestasModule,
 

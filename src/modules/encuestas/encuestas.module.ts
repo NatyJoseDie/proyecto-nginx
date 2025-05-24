@@ -12,7 +12,6 @@ import { RespuestasController } from './controllers/respuestas.controller';
 import { RespuestasService } from './services/respuestas.service';
 import { PreguntasController } from './controllers/preguntas.controller';
 import { PreguntasService } from './services/preguntas.service';
-import { ValidateAnswerPipe } from 'src/pipes/validate-answer/validate-answer.pipe';
 
 @Module({
   imports: [
@@ -27,12 +26,7 @@ import { ValidateAnswerPipe } from 'src/pipes/validate-answer/validate-answer.pi
   ],
   controllers: [EncuestasController, RespuestasController, PreguntasController],
   //definen los métdos que manejan las solicitudes a determionadas rutas
-  providers: [
-    EncuestasService,
-    RespuestasService,
-    PreguntasService,
-    ValidateAnswerPipe,
-  ],
+  providers: [EncuestasService, RespuestasService, PreguntasService],
   //objetos de una clase que el framework va a dejar disponible para que se pueda inyectar
   // imports: []
 })
