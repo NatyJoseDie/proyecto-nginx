@@ -55,11 +55,6 @@ export class RespuestasService {
     idEncuesta: number,
     respuestaOpcion: Opcion,
   ) {
-    // const respuesta: Respuesta = this.respuestaRepository.create({
-    //   encuesta: { id: idEncuesta },
-    //   ...dto,
-    // });
-
     try {
       const encuesta = await this.encuestaRepository.findOneBy({
         id: idEncuesta,

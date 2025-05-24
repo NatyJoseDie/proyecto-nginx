@@ -9,7 +9,6 @@ import {
   OneToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
-  AfterLoad,
 } from 'typeorm';
 import { RespuestaAbierta } from './respuesta-abierta.entity';
 
