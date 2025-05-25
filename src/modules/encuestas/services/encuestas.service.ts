@@ -1,13 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  BaseEntity,
+  ObjectLiteral,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import { Encuesta } from '../entities/encuesta.entity';
 import { CodigoTipoEnum } from '../enums/codigo-tipo.enum';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 import { v4 } from 'uuid';
 // import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
 import { Pregunta } from '../entities/pregunta.entity';
-
+import { Entity } from 'typeorm';
 @Injectable()
 export class EncuestasService {
   constructor(
@@ -43,7 +48,7 @@ export class EncuestasService {
     id: number,
     codigo: string,
     codigoTipo: CodigoTipoEnum.RESPUESTA | CodigoTipoEnum.RESULTADOS,
-  ): Promise<Encuesta> {
+  ) {
     let query: SelectQueryBuilder<Encuesta>;
 
     switch (codigoTipo) {
@@ -59,6 +64,7 @@ export class EncuestasService {
         break;
       case CodigoTipoEnum.RESULTADOS:
         query = this.encuestasRepository
+
           .createQueryBuilder('encuesta')
           .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
           .leftJoinAndSelect('pregunta.opciones', 'preguntaOpcion')
@@ -95,6 +101,63 @@ export class EncuestasService {
     }
     return encuesta;
   }
+  // async obtenerEncuesta(
+  //   id: number,
+  //   codigo: string,
+  //   codigoTipo: CodigoTipoEnum.RESPUESTA | CodigoTipoEnum.RESULTADOS,
+  // ) {
+  //   let query: SelectQueryBuilder<Encuesta>;
+
+  //   switch (codigoTipo) {
+  //     case CodigoTipoEnum.RESPUESTA:
+  //       query = this.encuestasRepository
+  //         .createQueryBuilder('encuesta')
+  //         .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
+  //         .leftJoinAndSelect('pregunta.opciones', 'preguntaOpcion')
+  //         .where('encuesta.id = :id', { id });
+  //       query.andWhere('encuesta.codigoRespuesta = :codigo', { codigo });
+  //       query.orderBy('pregunta.numero', 'ASC');
+  //       query.addOrderBy('preguntaOpcion.numero', 'ASC');
+  //       break;
+  //     case CodigoTipoEnum.RESULTADOS:
+  //       query = this.encuestasRepository
+
+  //         .createQueryBuilder('encuesta')
+  //         .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
+  //         .leftJoinAndSelect('pregunta.opciones', 'preguntaOpcion')
+  //         .innerJoinAndSelect('encuesta.respuestas', 'respuesta')
+  //         .leftJoinAndSelect(
+  //           'respuesta.respuestasOpciones',
+  //           'preguntaRespuestaOpcion',
+  //         )
+  //         .leftJoinAndSelect(
+  //           'preguntaRespuestaOpcion.opcion',
+  //           'respuestaOpcionOpcion',
+  //         )
+  //         .leftJoinAndSelect(
+  //           'respuesta.respuestasAbiertas',
+  //           'preguntaRespuestaAbierta',
+  //         )
+  //         .leftJoinAndSelect(
+  //           'preguntaRespuestaAbierta.pregunta',
+  //           'respuestaAbiertaPregunta',
+  //         )
+  //         .where('encuesta.id = :id', { id });
+  //       query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
+
+  //       break;
+  //   }
+
+  //   console.log('QUERY:', query.getSql());
+  //   console.log('PARAMS:', query.getParameters());
+
+  //   const encuesta = await query.getOne();
+
+  //   if (!encuesta) {
+  //     throw new BadRequestException('Datos de encuesta no válidos');
+  //   }
+  //   return encuesta;
+  // }
   async seedDb() {
     const queryBuilder = this.encuestasRepository.createQueryBuilder();
     // const encuestasRaw = [

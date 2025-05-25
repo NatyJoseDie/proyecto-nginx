@@ -3,7 +3,6 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Pregunta } from './pregunta.entity';
 
 import { Respuesta } from './respuesta.entity';
-import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'encuestas' })
 export class Encuesta {

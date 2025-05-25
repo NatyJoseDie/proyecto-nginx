@@ -1,5 +1,4 @@
 import {
-  AfterLoad,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -31,7 +30,6 @@ export class Respuesta {
       eager: true,
     },
   )
-  // @Exclude()
   respuestasOpciones: RespuestaOpcion[];
 
   @OneToMany(
@@ -42,6 +40,5 @@ export class Respuesta {
       eager: true,
     },
   )
-  // @Exclude()
   respuestasAbiertas: RespuestaAbierta[];
 }
