@@ -1,5 +1,4 @@
 import {
-  AfterLoad,
   Entity,
   JoinColumn,
   ManyToOne,
