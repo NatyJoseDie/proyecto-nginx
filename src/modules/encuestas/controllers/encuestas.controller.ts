@@ -1,24 +1,25 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Param,
-  Query,
-  Patch,
-  // UsePipes,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Query } from '@nestjs/common';
 
 import { EncuestasService } from '../services/encuestas.service';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 
 import { ObtenerEncuestaDTO } from '../dtos/obtener-encuesta.dto';
 import { Encuesta } from '../entities/encuesta.entity';
-// import { ValidateAnswerPipe } from 'src/pipes/validate-answer/validate-answer.pipe';
+import { ObtenerEstadisticaEncuestaDTO } from '../dtos/obtener-estadisticas-dto';
+import { EstadisticasDto } from '../dtos/estadisticas-resultados.dto';
 
 @Controller('/encuestas')
 export class EncuestasController {
   constructor(private encuestasService: EncuestasService) {}
+
+  @Post()
+  async crearEncuesta(@Body() dto: CreateEncuestaDTO): Promise<{
+    id: number;
+    codigoRespuesta: string;
+    codigoResultados: string;
+  }> {
+    return await this.encuestasService.crearEncuesta(dto);
+  }
 
   @Get(':id')
   async obtenerEncuesta(
@@ -31,19 +32,14 @@ export class EncuestasController {
       dto.tipo,
     );
   }
-
-  @Post()
-  async crearEncuesta(@Body() dto: CreateEncuestaDTO): Promise<{
-    id: number;
-    codigoRespuesta: string;
-    codigoResultados: string;
-  }> {
-    return await this.encuestasService.crearEncuesta(dto);
-  }
-  @Patch()
-  async patchEncuesta() {}
-  @Post('seed')
-  async seedEncuesta() {
-    return await this.encuestasService.seedDb();
+  @Get('/estadisticas/:id')
+  async obtenerEstadisticaEncuesta(
+    @Param('id') id: number,
+    @Query() dto: ObtenerEstadisticaEncuestaDTO,
+  ): Promise<EstadisticasDto> {
+    return await this.encuestasService.obtenerEstadisticaEncuesta(
+      id,
+      dto.codigo,
+    );
   }
 }

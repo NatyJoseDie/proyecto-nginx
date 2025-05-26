@@ -5,20 +5,13 @@ import { Encuesta } from '../entities/encuesta.entity';
 import { CodigoTipoEnum } from '../enums/codigo-tipo.enum';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 import { v4 } from 'uuid';
-// import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
-import { Pregunta } from '../entities/pregunta.entity';
-import { RespuestaAbierta } from '../entities/respuesta-abierta.entity';
-import { RespuestaOpcion } from '../entities/respuesta-opcion.entity';
+import { EstadisticasDto } from '../dtos/estadisticas-resultados.dto';
 
 @Injectable()
 export class EncuestasService {
   constructor(
     @InjectRepository(Encuesta)
     private encuestasRepository: Repository<Encuesta>,
-    @InjectRepository(RespuestaAbierta)
-    private readonly respuestaAbiertaRepository: Repository<RespuestaAbierta>,
-    @InjectRepository(RespuestaOpcion)
-    private readonly respuestaOpcionRepository: Repository<RespuestaOpcion>,
   ) {}
 
   async crearEncuesta(dto: CreateEncuestaDTO): Promise<{
@@ -39,189 +32,141 @@ export class EncuestasService {
       codigoResultados: encuestaGuardada.codigoResultados,
     };
   }
-  async getById(id: number, relations?: string[]) {
-    return await this.encuestasRepository.findOne({
-      where: { id },
-      relations: relations,
-    });
-  }
 
   async obtenerEncuesta(
     id: number,
     codigo: string,
     codigoTipo: CodigoTipoEnum.RESPUESTA | CodigoTipoEnum.RESULTADOS,
-  ) {
-    let query: SelectQueryBuilder<any>;
-    //  let query = this.encuestasRepository
-    //     .createQueryBuilder('encuesta')
-    //     .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
-    //     .leftJoinAndSelect('pregunta.opciones', 'preguntaOpcion')
-    //     .where('encuesta.id = :id', { id });
+  ): Promise<Encuesta> {
+    let query: SelectQueryBuilder<Encuesta>;
 
     switch (codigoTipo) {
       case CodigoTipoEnum.RESPUESTA:
         query = this.encuestasRepository
           .createQueryBuilder('encuesta')
-          .addCommonTableExpression('', 'n')
-          // query = this.encuestasRepository
-          //   .createQueryBuilder('encuesta')
-          //   .innerJoinAndSelect('encuesta.respuestas', 'respuesta')
-          //   .innerJoinAndSelect(
-          //     'respuesta.respuestasAbiertas',
-          //     'respuestasAbiertas',
-          //   )
-          //   .where('respuestasAbiertas.id_respuesta = respuesta.id')
-
+          .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
+          .leftJoinAndSelect('pregunta.opciones', 'preguntaOpcion')
           .where('encuesta.id = :id', { id });
-        query.andWhere('encuesta.codigoRespuesta= :codigo', { codigo });
-        // ////////////////
-        // query = this.encuestasRepository
-
-        //   .createQueryBuilder('encuesta')
-        //   .leftJoinAndSelect('encuesta.respuestas', 'respuesta')
-
-        //   .where('encuesta.id = :id', { id });
-
-        // query.andWhere('encuesta.codigoRespuesta= :codigo', { codigo });
-        /////////////////
-        // query = this.encuestasRepository
-
-        //   .createQueryBuilder('encuesta')
-        //   .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
-
-        //   .innerJoinAndSelect('pregunta.opciones', 'preguntaOpcion')
-        //   .innerJoinAndSelect('encuesta.respuestas', 'respuesta')
-        //   .leftJoinAndSelect(
-        //     'respuesta.respuestasOpciones',
-        //     'preguntaRespuestaOpcion',
-        //   )
-        //   .leftJoinAndSelect(
-        //     'preguntaRespuestaOpcion.opcion',
-        //     'respuestaOpcionOpcion',
-        //   )
-        //   .leftJoinAndSelect(
-        //     'respuesta.respuestasAbiertas',
-        //     'preguntaRespuestaAbierta',
-        //   )
-        //   .leftJoinAndSelect(
-        //     'preguntaRespuestaAbierta.pregunta',
-        //     'respuestaAbiertaPregunta',
-        //   )
-        //   .where('encuesta.id = :id', { id });
-        // query.andWhere('encuesta.codigoRespuesta= :codigo', { codigo });
-        // query.orderBy('pregunta.numero', 'ASC');
-        // query.addOrderBy('preguntaOpcion.numero', 'ASC');
-
+        query.andWhere('encuesta.codigoRespuesta = :codigo', { codigo });
+        query.orderBy('pregunta.numero', 'ASC');
+        query.addOrderBy('preguntaOpcion.numero', 'ASC');
         break;
-
       case CodigoTipoEnum.RESULTADOS:
         query = this.encuestasRepository
           .createQueryBuilder('encuesta')
           .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
           .leftJoinAndSelect('pregunta.opciones', 'preguntaOpcion')
-
+          .innerJoinAndSelect('encuesta.respuestas', 'respuesta')
+          .leftJoinAndSelect(
+            'respuesta.respuestasOpciones',
+            'preguntaRespuestaOpcion',
+          )
+          .leftJoinAndSelect(
+            'preguntaRespuestaOpcion.opcion',
+            'respuestaOpcionOpcion',
+          )
+          .leftJoinAndSelect(
+            'respuesta.respuestasAbiertas',
+            'preguntaRespuestaAbierta',
+          )
+          .leftJoinAndSelect(
+            'preguntaRespuestaAbierta.pregunta',
+            'respuestaAbiertaPregunta',
+          )
           .where('encuesta.id = :id', { id });
-        query.andWhere('encuesta.codigoResultados = :codigo', { codigo });
-        query.orderBy('pregunta.numero', 'ASC');
-        query.addOrderBy('preguntaOpcion.numero', 'ASC');
-
+        query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
         break;
     }
+
+    console.log('QUERY:', query.getSql());
+    console.log('PARAMS:', query.getParameters());
 
     const encuesta = await query.getOne();
 
     if (!encuesta) {
       throw new BadRequestException('Datos de encuesta no válidos');
     }
-
     return encuesta;
   }
-  // async obtenerEncuesta(
-  //   id: number,
-  //   codigo: string,
-  //   codigoTipo: CodigoTipoEnum.RESPUESTA | CodigoTipoEnum.RESULTADOS,
-  // ) {
-  //   let query: SelectQueryBuilder<Encuesta>;
+  async obtenerEstadisticaEncuesta(
+    id: number,
+    codigo: string,
+  ): Promise<EstadisticasDto> {
+    const query = this.encuestasRepository
+      .createQueryBuilder('encuesta')
+      .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
+      .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
 
-  //   switch (codigoTipo) {
-  //     case CodigoTipoEnum.RESPUESTA:
-  //       query = this.encuestasRepository
-  //         .createQueryBuilder('encuesta')
-  //         .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
-  //         .leftJoinAndSelect('pregunta.opciones', 'preguntaOpcion')
-  //         .where('encuesta.id = :id', { id });
-  //       query.andWhere('encuesta.codigoRespuesta = :codigo', { codigo });
-  //       query.orderBy('pregunta.numero', 'ASC');
-  //       query.addOrderBy('preguntaOpcion.numero', 'ASC');
-  //       break;
-  //     case CodigoTipoEnum.RESULTADOS:
-  //       query = this.encuestasRepository
+      .innerJoinAndSelect('encuesta.respuestas', 'respuesta')
 
-  //         .createQueryBuilder('encuesta')
-  //         .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
-  //         .leftJoinAndSelect('pregunta.opciones', 'preguntaOpcion')
-  //         .innerJoinAndSelect('encuesta.respuestas', 'respuesta')
-  //         .leftJoinAndSelect(
-  //           'respuesta.respuestasOpciones',
-  //           'preguntaRespuestaOpcion',
-  //         )
-  //         .leftJoinAndSelect(
-  //           'preguntaRespuestaOpcion.opcion',
-  //           'respuestaOpcionOpcion',
-  //         )
-  //         .leftJoinAndSelect(
-  //           'respuesta.respuestasAbiertas',
-  //           'preguntaRespuestaAbierta',
-  //         )
-  //         .leftJoinAndSelect(
-  //           'preguntaRespuestaAbierta.pregunta',
-  //           'respuestaAbiertaPregunta',
-  //         )
-  //         .where('encuesta.id = :id', { id });
-  //       query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
+      .leftJoinAndSelect('respuesta.respuestasOpciones', 'respuestaOpcion')
+      .leftJoinAndSelect('respuestaOpcion.opcion', 'opcionRespuesta')
+      .leftJoinAndSelect(
+        'opcionRespuesta.pregunta',
+        'preguntaDeOpcionRespuesta',
+      )
 
-  //       break;
-  //   }
+      .leftJoinAndSelect('respuesta.respuestasAbiertas', 'respuestaAbierta')
+      .leftJoinAndSelect('respuestaAbierta.pregunta', 'preguntaAbierta')
 
-  //   console.log('QUERY:', query.getSql());
-  //   console.log('PARAMS:', query.getParameters());
+      .where('encuesta.id = :id', { id });
 
-  //   const encuesta = await query.getOne();
+    query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
+    const encuesta = await query.getOne();
 
-  //   if (!encuesta) {
-  //     throw new BadRequestException('Datos de encuesta no válidos');
-  //   }
-  //   return encuesta;
-  // }
-  async seedDb() {
-    const queryBuilder = this.encuestasRepository.createQueryBuilder();
-    // const encuestasRaw = [
-    //   {
-    //     nombre: 'encuesta',
-    //     preguntas: [
-    //       { tipo: 'ABIERTA', texto: 'Que lenguajes de programacion manejas ' },
-    //     ],
-    //   },
-    // ];
-    const encuesta: Encuesta = new Encuesta();
-    const pregunta: Pregunta = new Pregunta();
-    Object.assign(pregunta, {
-      tipo: 'ABIERTA',
-      numero: 1,
-      texto: 'Que lenguajes de programacion manejas 678?',
-    });
-    Object.assign(encuesta, {
-      nombre: 'encuesta batch test',
-      codigoRespuesta: v4(),
-      codigoResultados: v4(),
-      preguntas: [pregunta],
-    });
-    const encuestas: Encuesta[] = [encuesta];
+    if (!encuesta) {
+      throw new BadRequestException('Datos de encuesta no válidos');
+    }
 
-    return await queryBuilder
-      .insert()
-      .into(Encuesta)
-      .values(encuestas)
-      .execute();
+    return this.crearEstadisticas(encuesta);
+  }
+
+  private crearEstadisticas(encuesta: Encuesta): EstadisticasDto {
+    const dto: EstadisticasDto = {
+      id: encuesta.id,
+      nombre: encuesta.nombre,
+      codigoRespuesta: encuesta.codigoRespuesta,
+      preguntas: encuesta.preguntas.map((p) => ({
+        id: p.id,
+        numero: p.numero,
+        texto: p.texto,
+        tipo: p.tipo,
+        opciones: p.opciones || [],
+        respuestasOpciones: [],
+        respuestasAbiertas: [],
+      })),
+    };
+
+    for (const respuesta of encuesta.respuestas || []) {
+      for (const ro of respuesta.respuestasOpciones || []) {
+        const pregunta = dto.preguntas.find((p) => p.id === ro.preguntaId);
+        if (pregunta) {
+          // Buscar si ya existe conteo para esa opción
+          const conteo = pregunta.respuestasOpciones.find(
+            (r) => r.opcionId === ro.opcionId,
+          );
+          if (conteo) {
+            conteo.cantidad += 1;
+          } else {
+            pregunta.respuestasOpciones.push({
+              id: ro.id,
+              opcionId: ro.opcionId,
+              cantidad: 1,
+            });
+          }
+        }
+      }
+      for (const ra of respuesta.respuestasAbiertas || []) {
+        const pregunta = dto.preguntas.find((p) => p.id === ra.preguntaId);
+        if (pregunta) {
+          pregunta.respuestasAbiertas.push({
+            id: ra.id,
+            texto: ra.texto,
+          });
+        }
+      }
+    }
+
+    return dto;
   }
 }
