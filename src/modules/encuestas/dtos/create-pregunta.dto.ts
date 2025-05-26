@@ -1,12 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  ArrayMinSize,
   IsArray,
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
-  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
@@ -30,14 +29,8 @@ export class CreatePreguntaDTO {
   tipo: TiposRespuestaEnum;
 
   @ApiProperty({ type: [CreateOpcionDTO], required: false })
-  @ValidateIf((obj: { tipo: TiposRespuestaEnum }) => {
-    return (
-      obj.tipo === TiposRespuestaEnum.OPCION_MULTIPLE_SELECCION_MULTIPLE ||
-      obj.tipo === TiposRespuestaEnum.OPCION_MULTIPLE_SELECCION_SIMPLE
-    );
-  })
   @IsArray()
-  @ArrayMinSize(2)
+  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreateOpcionDTO)
   opciones?: CreateOpcionDTO[];
