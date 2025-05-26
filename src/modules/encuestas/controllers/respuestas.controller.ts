@@ -42,6 +42,7 @@ export class RespuestasController {
       return await this.respuestasService.createRespuestaAbierta(
         respuesta,
         idEncuesta,
+        pregunta,
       );
     }
 

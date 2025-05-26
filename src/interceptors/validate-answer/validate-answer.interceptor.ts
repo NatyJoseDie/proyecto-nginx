@@ -11,6 +11,7 @@ import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { Opcion } from 'src/modules/encuestas/entities/opcion.entity';
 import { Pregunta } from 'src/modules/encuestas/entities/pregunta.entity';
+import { TiposRespuestaEnum } from 'src/modules/encuestas/enums/tipos-respuesta.enum';
 
 import { Repository } from 'typeorm';
 
@@ -33,6 +34,9 @@ export class ValidateAnswerInterceptor implements NestInterceptor {
     });
     if (!pregunta) {
       throw new HttpException('No se encontro pregunta', HttpStatus.NOT_FOUND);
+    }
+    if (pregunta.tipo === TiposRespuestaEnum.ABIERTA) {
+      return next.handle();
     }
     if (!pregunta.opciones.some((el: Opcion) => el.texto === body.texto)) {
       throw new HttpException(

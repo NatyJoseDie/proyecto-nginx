@@ -112,8 +112,6 @@ export class PreguntasService {
     return this.findOne(id);
   } */
   async getPreguntaByQuery(preguntaId: number, encuestaId: number) {
-    console.log(encuestaId);
-    console.log(preguntaId);
     const query = this.preguntaRepository
       .createQueryBuilder('pregunta')
       .where('pregunta.id = :preguntaId', { preguntaId })

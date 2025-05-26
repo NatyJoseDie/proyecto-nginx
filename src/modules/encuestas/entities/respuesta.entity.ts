@@ -1,4 +1,5 @@
 import {
+  AfterLoad,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -9,7 +10,6 @@ import {
 import { Encuesta } from './encuesta.entity';
 import { RespuestaOpcion } from './respuesta-opcion.entity';
 import { RespuestaAbierta } from './respuesta-abierta.entity';
-import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'respuestas' })
 export class Respuesta {

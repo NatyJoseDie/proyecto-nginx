@@ -15,6 +15,7 @@ import { Encuesta } from '../entities/encuesta.entity';
 import { RespuestaOpcion } from '../entities/respuesta-opcion.entity';
 import { Opcion } from '../entities/opcion.entity';
 import { RespuestaAbierta } from '../entities/respuesta-abierta.entity';
+import { Pregunta } from '../entities/pregunta.entity';
 
 @Injectable()
 export class RespuestasService {
@@ -29,7 +30,11 @@ export class RespuestasService {
     private readonly respuestaAbiertaRepository: Repository<RespuestaAbierta>,
   ) {}
 
-  async createRespuestaAbierta(dto: CreateRespuestaDTO, idEncuesta: number) {
+  async createRespuestaAbierta(
+    dto: CreateRespuestaDTO,
+    idEncuesta: number,
+    pregunta: Pregunta,
+  ) {
     // const respuesta: Respuesta = this.respuestaRepository.create({
     //   encuesta: { id: idEncuesta },
     //   ...dto,
@@ -46,6 +51,11 @@ export class RespuestasService {
 
       Object.assign(respuesta, { respuestasAbiertas: [dto.texto], encuesta });
       const savedRespuesta = await this.respuestaRepository.save(respuesta);
+      await this.respuestaAbiertaRepository.save({
+        texto: dto.texto,
+        pregunta,
+        respuesta: savedRespuesta,
+      });
       return savedRespuesta;
     } catch (error) {
       console.log('in error', error);
