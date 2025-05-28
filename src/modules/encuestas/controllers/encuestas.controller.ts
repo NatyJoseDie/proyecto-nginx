@@ -5,8 +5,8 @@ import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 
 import { ObtenerEncuestaDTO } from '../dtos/obtener-encuesta.dto';
 import { Encuesta } from '../entities/encuesta.entity';
-import { ObtenerEstadisticaEncuestaDTO } from '../dtos/obtener-estadisticas-dto';
-import { EstadisticasDto } from '../dtos/estadisticas-resultados.dto';
+import { ObtenerResultadosEncuestaDTO } from '../dtos/obtener-resultados-dto';
+import { ResultadosDto } from '../dtos/resultados.dto';
 
 @Controller('/encuestas')
 export class EncuestasController {
@@ -32,12 +32,13 @@ export class EncuestasController {
       dto.tipo,
     );
   }
-  @Get('/estadisticas/:id')
-  async obtenerEstadisticaEncuesta(
+
+  @Get('/resultados/:id')
+  async obtenerResultadosEncuesta(
     @Param('id') id: number,
-    @Query() dto: ObtenerEstadisticaEncuestaDTO,
-  ): Promise<EstadisticasDto> {
-    return await this.encuestasService.obtenerEstadisticaEncuesta(
+    @Query() dto: ObtenerResultadosEncuestaDTO,
+  ): Promise<ResultadosDto> {
+    return await this.encuestasService.obtenerResultadosEncuesta(
       id,
       dto.codigo,
     );

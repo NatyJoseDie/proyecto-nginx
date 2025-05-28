@@ -5,7 +5,7 @@ import { Encuesta } from '../entities/encuesta.entity';
 import { CodigoTipoEnum } from '../enums/codigo-tipo.enum';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 import { v4 } from 'uuid';
-import { EstadisticasDto } from '../dtos/estadisticas-resultados.dto';
+import { ResultadosDto } from '../dtos/resultados.dto';
 
 @Injectable()
 export class EncuestasService {
@@ -88,10 +88,11 @@ export class EncuestasService {
     }
     return encuesta;
   }
-  async obtenerEstadisticaEncuesta(
+
+  async obtenerResultadosEncuesta(
     id: number,
     codigo: string,
-  ): Promise<EstadisticasDto> {
+  ): Promise<ResultadosDto> {
     const query = this.encuestasRepository
       .createQueryBuilder('encuesta')
       .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
@@ -118,11 +119,11 @@ export class EncuestasService {
       throw new BadRequestException('Datos de encuesta no válidos');
     }
 
-    return this.crearEstadisticas(encuesta);
+    return this.mapearResultados(encuesta);
   }
 
-  private crearEstadisticas(encuesta: Encuesta): EstadisticasDto {
-    const dto: EstadisticasDto = {
+  private mapearResultados(encuesta: Encuesta): ResultadosDto {
+    const dto: ResultadosDto = {
       id: encuesta.id,
       nombre: encuesta.nombre,
       codigoRespuesta: encuesta.codigoRespuesta,
@@ -135,6 +136,7 @@ export class EncuestasService {
         respuestasOpciones: [],
         respuestasAbiertas: [],
       })),
+      respuestas: [],
     };
 
     for (const respuesta of encuesta.respuestas || []) {
@@ -155,6 +157,33 @@ export class EncuestasService {
             });
           }
         }
+
+        const respuestaEncuestado = dto.respuestas.find(
+          (r) => r.id === respuesta.id,
+        );
+        if (respuestaEncuestado) {
+          const preguntaRespuesta = respuestaEncuestado.respuestas.find(
+            (p) => p.preguntaId === ro.preguntaId,
+          );
+          if (preguntaRespuesta) {
+            preguntaRespuesta.textoRespuesta.push(ro.opcion.texto);
+          } else {
+            respuestaEncuestado.respuestas.push({
+              preguntaId: ro.preguntaId,
+              textoRespuesta: [ro.opcion.texto],
+            });
+          }
+        } else {
+          dto.respuestas.push({
+            id: respuesta.id,
+            respuestas: [
+              {
+                preguntaId: ro.preguntaId,
+                textoRespuesta: [ro.opcion.texto],
+              },
+            ],
+          });
+        }
       }
       for (const ra of respuesta.respuestasAbiertas || []) {
         const pregunta = dto.preguntas.find((p) => p.id === ra.preguntaId);
@@ -162,6 +191,25 @@ export class EncuestasService {
           pregunta.respuestasAbiertas.push({
             id: ra.id,
             texto: ra.texto,
+          });
+        }
+        const respuestaEncuestado = dto.respuestas.find(
+          (r) => r.id === respuesta.id,
+        );
+        if (respuestaEncuestado) {
+          respuestaEncuestado.respuestas.push({
+            preguntaId: ra.preguntaId,
+            textoRespuesta: [ra.texto],
+          });
+        } else {
+          dto.respuestas.push({
+            id: respuesta.id,
+            respuestas: [
+              {
+                preguntaId: ra.preguntaId,
+                textoRespuesta: [ra.texto],
+              },
+            ],
           });
         }
       }
