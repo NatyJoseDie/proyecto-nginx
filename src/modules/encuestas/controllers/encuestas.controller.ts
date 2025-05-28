@@ -2,15 +2,22 @@ import { Body, Controller, Get, Post, Param, Query } from '@nestjs/common';
 
 import { EncuestasService } from '../services/encuestas.service';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
-
+ 
 import { ObtenerEncuestaDTO } from '../dtos/obtener-encuesta.dto';
 import { Encuesta } from '../entities/encuesta.entity';
 import { ObtenerEstadisticaEncuestaDTO } from '../dtos/obtener-estadisticas-dto';
 import { EstadisticasDto } from '../dtos/estadisticas-resultados.dto';
 
-@Controller('/encuestas')
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Encuestas')
+@Controller('encuestas')
 export class EncuestasController {
   constructor(private encuestasService: EncuestasService) {}
+
+  @Get()
+  async obtenerTodasLasEncuestas(): Promise<Encuesta[]> {
+    return await this.encuestasService.obtenerTodas();
+  }
 
   @Post()
   async crearEncuesta(@Body() dto: CreateEncuestaDTO): Promise<{

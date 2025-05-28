@@ -7,7 +7,7 @@ export default () => ({
     port: parseInt(process.env.DB_PORT || '5432'),
     username: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || '31553487',
-    name: process.env.DB_NAME || 'encuesta_web',
+    name: process.env.DB_NAME || 'encuesta_integrador',
     logging: process.env.DB_LOGGING === 'true',
     logger: process.env.DB_LOGGER || 'advanced-console',
   },

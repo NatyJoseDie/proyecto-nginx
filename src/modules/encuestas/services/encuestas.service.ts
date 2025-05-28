@@ -14,6 +14,12 @@ export class EncuestasService {
     private encuestasRepository: Repository<Encuesta>,
   ) {}
 
+  async obtenerTodas(): Promise<Encuesta[]> {
+    return await this.encuestasRepository.find({
+      relations: ['preguntas', 'preguntas.opciones'],
+    });
+  }
+
   async crearEncuesta(dto: CreateEncuestaDTO): Promise<{
     id: number;
     codigoRespuesta: string;
