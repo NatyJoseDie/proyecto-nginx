@@ -1,3 +1,5 @@
+import { PalabraFrecuenciaDto } from './palabra-frecuencia.dto';
+
 class OpcionDto {
   id: number;
   texto: string;
@@ -15,7 +17,7 @@ class RespuestaAbiertaDto {
   texto: string;
 }
 
-class PreguntaDto {
+export class PreguntaDto {
   id: number;
   numero: number;
   texto: string;
@@ -23,6 +25,7 @@ class PreguntaDto {
   opciones: OpcionDto[];
   respuestasOpciones: RespuestaOpcionDto[];
   respuestasAbiertas: RespuestaAbiertaDto[];
+  frecuenciaPalabras: PalabraFrecuenciaDto[];
 }
 
 class RespuestasDto {
