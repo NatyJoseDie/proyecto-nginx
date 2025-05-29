@@ -1,41 +1,41 @@
 import {
   Entity,
-  Column,
-  PrimaryGeneratedColumn,
+  JoinColumn,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { Encuesta } from './encuesta.entity';
-import { RespuestaAbierta } from './respuesta-abierta.entity';
 import { RespuestaOpcion } from './respuesta-opcion.entity';
+import { RespuestaAbierta } from './respuesta-abierta.entity';
 
-@Entity('respuestas')
+@Entity({ name: 'respuestas' })
 export class Respuesta {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'uuid', default: () => 'gen_random_uuid()', unique: true })
-  codigoAcceso: string;
-
   @ManyToOne(() => Encuesta, (encuesta) => encuesta.respuestas, {
     nullable: false,
   })
+  @JoinColumn({ name: 'id_encuesta' })
   encuesta: Encuesta;
-
-  @OneToMany(
-    () => RespuestaAbierta,
-    (respuestaAbierta) => respuestaAbierta.respuesta,
-    { onDelete: 'CASCADE' },
-  )
-  respuestasAbiertas: RespuestaAbierta[];
 
   @OneToMany(
     () => RespuestaOpcion,
     (respuestaOpcion) => respuestaOpcion.respuesta,
-    { onDelete: 'CASCADE' },
+    {
+      cascade: ['insert'],
+    },
   )
   respuestasOpciones: RespuestaOpcion[];
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  fechaCreacion: Date;
+  @OneToMany(
+    () => RespuestaAbierta,
+    (respuestaAbierta) => respuestaAbierta.respuesta,
+    {
+      cascade: ['insert'],
+    },
+  )
+  respuestasAbiertas: RespuestaAbierta[];
 }

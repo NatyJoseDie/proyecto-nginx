@@ -1,27 +1,32 @@
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
+  Entity,
   ManyToOne,
   OneToMany,
+  JoinColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Pregunta } from './pregunta.entity';
-import { RespuestaOpcion } from './respuesta-opcion.entity'; // Changed from interface to entity
 
-@Entity('opciones')
+import { Exclude } from 'class-transformer';
+import { Pregunta } from './pregunta.entity';
+import { RespuestaOpcion } from './respuesta-opcion.entity';
+
+@Entity({ name: 'opciones' })
 export class Opcion {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column()
   texto: string;
 
-  @Column({ type: 'int', nullable: false })
+  @Column()
   numero: number;
 
   @ManyToOne(() => Pregunta, (pregunta) => pregunta.opciones)
+  @JoinColumn({ name: 'id_pregunta' })
   pregunta: Pregunta;
 
   @OneToMany(() => RespuestaOpcion, (respuestaOpcion) => respuestaOpcion.opcion)
+  @Exclude()
   respuestasOpciones: RespuestaOpcion[];
 }
