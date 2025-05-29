@@ -5,13 +5,17 @@ import { Encuesta } from '../entities/encuesta.entity';
 import { CodigoTipoEnum } from '../enums/codigo-tipo.enum';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 import { v4 } from 'uuid';
-import { ResultadosDto } from '../dtos/resultados.dto';
+import { PreguntaDto, ResultadosDto } from '../dtos/resultados.dto';
+import { NubePalabrasService } from '../services/nube-palabras.service';
+import { PalabraFrecuenciaDto } from '../dtos/palabra-frecuencia.dto';
+import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
 
 @Injectable()
 export class EncuestasService {
   constructor(
     @InjectRepository(Encuesta)
     private encuestasRepository: Repository<Encuesta>,
+    private nubePalabrasService: NubePalabrasService,
   ) {}
 
   async crearEncuesta(dto: CreateEncuestaDTO): Promise<{
@@ -118,8 +122,10 @@ export class EncuestasService {
     if (!encuesta) {
       throw new BadRequestException('Datos de encuesta no válidos');
     }
+    let resultados = this.mapearResultados(encuesta);
+    this.agregarNubePalabras(resultados);
 
-    return this.mapearResultados(encuesta);
+    return resultados;
   }
 
   private mapearResultados(encuesta: Encuesta): ResultadosDto {
@@ -135,6 +141,7 @@ export class EncuestasService {
         opciones: p.opciones || [],
         respuestasOpciones: [],
         respuestasAbiertas: [],
+        frecuenciaPalabras: [],
       })),
       respuestas: [],
     };
@@ -216,5 +223,18 @@ export class EncuestasService {
     }
 
     return dto;
+  }
+
+  private agregarNubePalabras(resultados: ResultadosDto): void {
+    for (const pregunta of resultados.preguntas || []) {
+      if (pregunta.tipo === TiposRespuestaEnum.ABIERTA) {
+        pregunta.frecuenciaPalabras =
+          this.nubePalabrasService.generarNubePalabras(
+            pregunta.respuestasAbiertas.map((ra) => {
+              return ra.texto;
+            }),
+          );
+      }
+    }
   }
 }
