@@ -5,7 +5,7 @@ import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 
 import { ObtenerEncuestaDTO } from '../dtos/obtener-encuesta.dto';
 import { Encuesta } from '../entities/encuesta.entity';
-import { ObtenerResultadosEncuestaDTO } from '../dtos/obtener-resultados-dto';
+import { CodigoDTO } from '../dtos/obtener-resultados-dto';
 import { ResultadosDto } from '../dtos/resultados.dto';
 import { Response } from 'express';
 import { parse } from 'json2csv';
@@ -37,7 +37,7 @@ export class EncuestasController {
   @Get('/resultados/:id')
   async obtenerResultadosEncuesta(
     @Param('id') id: number,
-    @Query() dto: ObtenerResultadosEncuestaDTO,
+    @Query() dto: CodigoDTO,
   ): Promise<ResultadosDto> {
     return await this.encuestasService.obtenerResultadosEncuesta(
       id,
@@ -49,7 +49,7 @@ export class EncuestasController {
   async exportarCSV(
     @Res() res: Response,
     @Param('id') id: number,
-    @Query() dto: ObtenerResultadosEncuestaDTO,
+    @Query() dto: CodigoDTO,
   ) {
     const encuesta = await this.encuestasService.obtenerResultadosEncuesta(
       id,
