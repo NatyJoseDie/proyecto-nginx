@@ -5,9 +5,8 @@ import { Encuesta } from '../entities/encuesta.entity';
 import { CodigoTipoEnum } from '../enums/codigo-tipo.enum';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 import { v4 } from 'uuid';
-import { PreguntaDto, ResultadosDto } from '../dtos/resultados.dto';
+import { ResultadosDto } from '../dtos/resultados.dto';
 import { NubePalabrasService } from '../services/nube-palabras.service';
-import { PalabraFrecuenciaDto } from '../dtos/palabra-frecuencia.dto';
 import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
 
 @Injectable()
