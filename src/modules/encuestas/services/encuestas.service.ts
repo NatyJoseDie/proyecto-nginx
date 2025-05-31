@@ -101,7 +101,7 @@ export class EncuestasService {
       .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
       .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
 
-      .innerJoinAndSelect('encuesta.respuestas', 'respuesta')
+      .leftJoinAndSelect('encuesta.respuestas', 'respuesta')
 
       .leftJoinAndSelect('respuesta.respuestasOpciones', 'respuestaOpcion')
       .leftJoinAndSelect('respuestaOpcion.opcion', 'opcionRespuesta')
