@@ -25,19 +25,33 @@ export class EncuestasService {
     codigoRespuesta: string;
     codigoResultados: string;
   }> {
-    const encuesta: Encuesta = this.encuestasRepository.create({
-      ...dto,
-      codigoRespuesta: v4(),
-      codigoResultados: v4(),
-    });
-
-    const encuestaGuardada = await this.encuestasRepository.save(encuesta);
-    return {
-      id: encuestaGuardada.id,
-      codigoRespuesta: encuestaGuardada.codigoRespuesta,
-      codigoResultados: encuestaGuardada.codigoResultados,
-    };
+  // ✅ Agregar opciones automáticamente si la pregunta es de tipo VERDADERO_FALSO
+  for (const pregunta of dto.preguntas) {
+    if (
+      pregunta.tipo === 'VERDADERO_FALSO' &&
+      (!pregunta.opciones || pregunta.opciones.length === 0)
+    ) {
+      pregunta.opciones = [
+        { texto: 'Verdadero', numero: 1 },
+        { texto: 'Falso', numero: 2 },
+      ];
+    }
   }
+
+  const encuesta: Encuesta = this.encuestasRepository.create({
+    ...dto,
+    codigoRespuesta: v4(),
+    codigoResultados: v4(),
+  });
+
+  const encuestaGuardada = await this.encuestasRepository.save(encuesta);
+  return {
+    id: encuestaGuardada.id,
+    codigoRespuesta: encuestaGuardada.codigoRespuesta,
+    codigoResultados: encuestaGuardada.codigoResultados,
+  };
+}
+
 
   async obtenerEncuesta(
     id: number,
@@ -114,6 +128,9 @@ export class EncuestasService {
 
       .leftJoinAndSelect('respuesta.respuestasAbiertas', 'respuestaAbierta')
       .leftJoinAndSelect('respuestaAbierta.pregunta', 'preguntaAbierta')
+      .leftJoinAndSelect('respuesta.respuestasVerdaderoFalso', 'respuestaVF')
+      .leftJoinAndSelect('respuestaVF.pregunta', 'preguntaVF')
+
 
       .where('encuesta.id = :id', { id });
 

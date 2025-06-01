@@ -9,6 +9,7 @@ import { Exclude } from 'class-transformer';
 import { Encuesta } from './encuesta.entity';
 import { RespuestaOpcion } from './respuesta-opcion.entity';
 import { RespuestaAbierta } from './respuesta-abierta.entity';
+import { RespuestaVerdaderoFalso } from './respuesta-verdadero-falso.entity';
 
 @Entity({ name: 'respuestas' })
 export class Respuesta {
@@ -38,4 +39,13 @@ export class Respuesta {
     },
   )
   respuestasAbiertas: RespuestaAbierta[];
+
+  @OneToMany(
+    () => RespuestaVerdaderoFalso,
+    (r) => r.respuesta,
+    {
+      cascade: ['insert'],
+    },
+  )
+  respuestasVerdaderoFalso: RespuestaVerdaderoFalso[];
 }

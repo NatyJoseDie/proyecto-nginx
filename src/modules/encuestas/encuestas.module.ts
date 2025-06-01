@@ -8,6 +8,7 @@ import { Opcion } from './entities/opcion.entity';
 import { Respuesta } from './entities/respuesta.entity';
 import { RespuestaAbierta } from './entities/respuesta-abierta.entity';
 import { RespuestaOpcion } from './entities/respuesta-opcion.entity';
+import { RespuestaVerdaderoFalso } from './entities/respuesta-verdadero-falso.entity';
 import { RespuestasController } from './controllers/respuestas.controller';
 import { RespuestasService } from './services/respuestas.service';
 
@@ -20,6 +21,7 @@ import { RespuestasService } from './services/respuestas.service';
       Respuesta,
       RespuestaAbierta,
       RespuestaOpcion,
+      RespuestaVerdaderoFalso, // <-- agregada
     ]),
   ],
   controllers: [EncuestasController, RespuestasController],
