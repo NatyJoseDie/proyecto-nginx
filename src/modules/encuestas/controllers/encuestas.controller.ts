@@ -2,16 +2,13 @@ import { Body, Controller, Get, Res, Post, Param, Query } from '@nestjs/common';
 
 import { EncuestasService } from '../services/encuestas.service';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
- 
+
 import { ObtenerEncuestaDTO } from '../dtos/obtener-encuesta.dto';
 import { Encuesta } from '../entities/encuesta.entity';
 import { CodigoDTO } from '../dtos/obtener-resultados-dto';
 import { ResultadosDto } from '../dtos/resultados.dto';
 import { Response } from 'express';
 import { parse } from 'json2csv';
-@Controller('/encuestas')
-import { ObtenerEstadisticaEncuestaDTO } from '../dtos/obtener-estadisticas-dto';
-import { EstadisticasDto } from '../dtos/estadisticas-resultados.dto';
 
 import { ApiTags } from '@nestjs/swagger';
 @ApiTags('Encuestas')
