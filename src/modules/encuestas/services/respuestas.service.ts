@@ -37,7 +37,17 @@ export class RespuestasService {
   async crearRespuesta(
     dto: CreateRespuestaDTO,
     idEncuesta: number,
+    codigo: string,
   ): Promise<{ mensaje: string }> {
+    const query = this.encuestasRepository
+      .createQueryBuilder('encuesta')
+      .where('encuesta.id = :id', { idEncuesta });
+    query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
+    const encuesta = await query.getOne();
+
+    if (!encuesta) {
+      throw new BadRequestException('Datos de encuesta no válidos');
+    }
     // Crear la respuesta general
     const respuesta = await this.respuestaRepository.save(
       this.respuestaRepository.create({
