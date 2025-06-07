@@ -69,8 +69,8 @@ export class EncuestasController {
       preguntasMap.set(p.id, p.texto);
     }
 
-    const filas = encuesta.respuestas.map((respuesta: any) => {
-      const fila: any = { id: respuesta.id };
+    const filas = encuesta.respuestas.map((respuesta: any, indice: number) => {
+      const fila: any = { id: indice + 1 };
 
       for (const r of respuesta.respuestas) {
         const textoPregunta =
