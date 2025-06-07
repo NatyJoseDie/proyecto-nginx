@@ -9,8 +9,8 @@ module.exports = {
         CORS_ORIGIN: 'localhost',
         DB_HOST: 'localhost',
         DB_PORT: 5432,
-        DB_USER: '',
-        DB_PASSWORD: '',
+        DB_USER: 'postgres',
+        DB_PASSWORD: 'admin',
         DB_NAME: 'encuesta_web',
         DB_LOGGING: 'false',
         GLOBAL_PREFIX: 'api',
@@ -21,7 +21,7 @@ module.exports = {
   ],
 };
 
-////instalar pm2 en la carpeta que contiene tanto al back como al front
+////instalar pm2
 //npm install pm2 -g
 
 //// arranca la app
@@ -39,5 +39,5 @@ module.exports = {
 ////
 // pm2 monit
 
-////compilar y pm2 arracna el proceso con el archivo que fue configurado
+////compilar y pm2 arranca el proceso con el archivo que fue configurado
 //npm run deploy
