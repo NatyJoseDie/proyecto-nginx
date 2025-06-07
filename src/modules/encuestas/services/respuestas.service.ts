@@ -41,7 +41,7 @@ export class RespuestasService {
   ): Promise<{ mensaje: string }> {
     const query = this.encuestasRepository
       .createQueryBuilder('encuesta')
-      .where('encuesta.id = :id', { idEncuesta });
+      .where('encuesta.id = :id', { id: idEncuesta });
     query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
     const encuesta = await query.getOne();
 
