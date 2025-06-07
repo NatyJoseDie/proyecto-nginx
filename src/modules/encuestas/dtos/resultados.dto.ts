@@ -17,6 +17,12 @@ class RespuestaAbiertaDto {
   texto: string;
 }
 
+class RespuestaVFDto {
+  id: number;
+  valor: boolean;
+  cantidad: number;
+}
+
 export class PreguntaDto {
   id: number;
   numero: number;
@@ -25,6 +31,7 @@ export class PreguntaDto {
   opciones: OpcionDto[];
   respuestasOpciones: RespuestaOpcionDto[];
   respuestasAbiertas: RespuestaAbiertaDto[];
+  respuestasVF: RespuestaVFDto[];
   frecuenciaPalabras: PalabraFrecuenciaDto[];
 }
 

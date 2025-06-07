@@ -28,33 +28,32 @@ export class EncuestasService {
     codigoRespuesta: string;
     codigoResultados: string;
   }> {
-  // ✅ Agregar opciones automáticamente si la pregunta es de tipo VERDADERO_FALSO
-  for (const pregunta of dto.preguntas) {
-    if (
-      pregunta.tipo === 'VERDADERO_FALSO' &&
-      (!pregunta.opciones || pregunta.opciones.length === 0)
-    ) {
-      pregunta.opciones = [
-        { texto: 'Verdadero', numero: 1 },
-        { texto: 'Falso', numero: 2 },
-      ];
+    // ✅ Agregar opciones automáticamente si la pregunta es de tipo VERDADERO_FALSO
+    for (const pregunta of dto.preguntas) {
+      if (
+        pregunta.tipo === 'VERDADERO_FALSO' &&
+        (!pregunta.opciones || pregunta.opciones.length === 0)
+      ) {
+        pregunta.opciones = [
+          { texto: 'Verdadero', numero: 1 },
+          { texto: 'Falso', numero: 2 },
+        ];
+      }
     }
+
+    const encuesta: Encuesta = this.encuestasRepository.create({
+      ...dto,
+      codigoRespuesta: v4(),
+      codigoResultados: v4(),
+    });
+
+    const encuestaGuardada = await this.encuestasRepository.save(encuesta);
+    return {
+      id: encuestaGuardada.id,
+      codigoRespuesta: encuestaGuardada.codigoRespuesta,
+      codigoResultados: encuestaGuardada.codigoResultados,
+    };
   }
-
-  const encuesta: Encuesta = this.encuestasRepository.create({
-    ...dto,
-    codigoRespuesta: v4(),
-    codigoResultados: v4(),
-  });
-
-  const encuestaGuardada = await this.encuestasRepository.save(encuesta);
-  return {
-    id: encuestaGuardada.id,
-    codigoRespuesta: encuestaGuardada.codigoRespuesta,
-    codigoResultados: encuestaGuardada.codigoResultados,
-  };
-}
-
 
   async obtenerEncuesta(
     id: number,
@@ -132,9 +131,9 @@ export class EncuestasService {
 
       .leftJoinAndSelect('respuesta.respuestasAbiertas', 'respuestaAbierta')
       .leftJoinAndSelect('respuestaAbierta.pregunta', 'preguntaAbierta')
+
       .leftJoinAndSelect('respuesta.respuestasVerdaderoFalso', 'respuestaVF')
       .leftJoinAndSelect('respuestaVF.pregunta', 'preguntaVF')
-
 
       .where('encuesta.id = :id', { id });
 
@@ -163,6 +162,7 @@ export class EncuestasService {
         opciones: p.opciones || [],
         respuestasOpciones: [],
         respuestasAbiertas: [],
+        respuestasVF: [],
         frecuenciaPalabras: [],
       })),
       respuestas: [],
@@ -237,6 +237,43 @@ export class EncuestasService {
               {
                 preguntaId: ra.preguntaId,
                 textoRespuesta: [ra.texto],
+              },
+            ],
+          });
+        }
+      }
+      for (const rvf of respuesta.respuestasVerdaderoFalso || []) {
+        const pregunta = dto.preguntas.find((p) => p.id === rvf.pregunta.id);
+        if (pregunta) {
+          const conteo = pregunta.respuestasVF.find(
+            (r) => rvf.valor === r.valor,
+          );
+          if (conteo) {
+            conteo.cantidad += 1;
+          } else {
+            pregunta.respuestasVF.push({
+              id: rvf.id,
+              valor: rvf.valor,
+              cantidad: 1,
+            });
+          }
+        }
+
+        const respuestaEncuestado = dto.respuestas.find(
+          (r) => r.id === respuesta.id,
+        );
+        if (respuestaEncuestado) {
+          respuestaEncuestado.respuestas.push({
+            preguntaId: rvf.pregunta.id,
+            textoRespuesta: [rvf.valor ? 'Verdadero' : 'Falso'],
+          });
+        } else {
+          dto.respuestas.push({
+            id: respuesta.id,
+            respuestas: [
+              {
+                preguntaId: rvf.pregunta.id,
+                textoRespuesta: [rvf.valor ? 'Verdadero' : 'Falso'],
               },
             ],
           });
