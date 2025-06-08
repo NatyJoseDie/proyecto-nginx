@@ -8,11 +8,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pregunta } from '../entities/pregunta.entity';
 import { CreatePreguntaDTO } from '../dtos/create-pregunta.dto';
-import { UpdatePreguntaDTO } from '../dtos/update-pregunta.dto';
+import { UpdatePreguntaDto } from '../dtos/update-pregunta.dto';
 import { Opcion } from '../entities/opcion.entity';
-
-import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
-import { Encuesta } from '../entities/encuesta.entity';
+import { CreateOpcionDTO } from '../dtos/create-opcion.dto';
+import { error } from 'console';
 
 @Injectable()
 export class PreguntasService {
@@ -21,8 +20,6 @@ export class PreguntasService {
     private readonly preguntaRepository: Repository<Pregunta>,
     @InjectRepository(Opcion)
     private readonly opcionRepository: Repository<Opcion>,
-    @InjectRepository(Encuesta)
-    private readonly encuestaRepository: Repository<Encuesta>,
   ) {}
 
   async findAll() {
@@ -43,12 +40,6 @@ export class PreguntasService {
   }
 
   async create(createPreguntaDto: CreatePreguntaDTO) {
-    if (createPreguntaDto.tipo === TiposRespuestaEnum.ABIERTA) {
-      delete createPreguntaDto.opciones;
-    }
-    return (await this.preguntaRepository.save(createPreguntaDto)) as Pregunta;
-  }
-  /*   async create(createPreguntaDto: CreatePreguntaDTO) {
     const { opciones, ...preguntaData } = createPreguntaDto;
 
     // Crear la pregunta sin opciones primero
@@ -58,7 +49,7 @@ export class PreguntasService {
     // Si se proporcionan opciones, crearlas por separado
 
     if (opciones && opciones.length > 0) {
-      const opcionesEntities  = opciones.map((texto) => {
+      const opcionesEntities = opciones.map((texto) => {
         return {
           texto,
           pregunta: preguntaGuardada,
@@ -66,30 +57,20 @@ export class PreguntasService {
       });
 
       // Guardar opciones con referencia a la pregunta
-       await this.opcionRepository.save(opcionesEntities);
+      // await this.opcionRepository.save(opcionesEntities);
+      throw new HttpException(
+        'Chequear metodo , error de tipos',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     return this.findOne(preguntaGuardada.id);
-  } */
-
-  async update(id: number, updatePreguntaDto: UpdatePreguntaDTO) {
-    if (updatePreguntaDto.tipo === TiposRespuestaEnum.ABIERTA) {
-      delete updatePreguntaDto.opciones;
-    }
-    const pregunta = await this.findOne(id);
-
-    if (!pregunta) {
-      throw new HttpException('No se encontro pregunta', HttpStatus.NOT_FOUND);
-    }
-    return await this.preguntaRepository.save({
-      ...pregunta,
-      ...updatePreguntaDto,
-    });
   }
-  /* async update(id: number, updatePreguntaDto: UpdatePreguntaDTO) {
+
+  async update(id: number, updatePreguntaDto: UpdatePreguntaDto) {
     const pregunta = await this.findOne(id);
     const { opciones, ...preguntaData } = updatePreguntaDto;
- 
+
     // Actualizar los datos de la pregunta
     this.preguntaRepository.merge(pregunta, preguntaData);
     await this.preguntaRepository.save(pregunta);
@@ -105,26 +86,16 @@ export class PreguntasService {
           texto,
           pregunta,
         }));
-        await this.opcionRepository.save(opcionesEntities);
+        // await this.opcionRepository.save(opcionesEntities);
       }
     }
- 
+    throw new HttpException(
+      'Chequear metodo , error de tipos',
+      HttpStatus.BAD_REQUEST,
+    );
     return this.findOne(id);
-  } */
-  async getPreguntaByQuery(preguntaId: number, encuestaId: number) {
-    const query = this.preguntaRepository
-      .createQueryBuilder('pregunta')
-      .where('pregunta.id = :preguntaId', { preguntaId })
-      .leftJoinAndSelect('pregunta.encuesta', 'encuesta')
-      .leftJoinAndSelect('pregunta.opciones', 'opciones')
-
-      .andWhere('encuesta.id = :encuestaId', { encuestaId });
-    const pregunta: Pregunta | null = await query.getOne();
-    if (!pregunta) {
-      throw new HttpException('No se encontro pregunta', HttpStatus.NOT_FOUND);
-    }
-    return pregunta;
   }
+
   async remove(id: number) {
     const pregunta = await this.findOne(id);
     return await this.preguntaRepository.remove(pregunta);

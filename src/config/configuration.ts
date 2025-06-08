@@ -6,9 +6,8 @@ export default () => ({
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432'),
     username: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || '31553487',
+    password: process.env.DB_PASSWORD || 'root',
     name: process.env.DB_NAME || 'encuesta_web',
-    logging: process.env.DB_LOGGING ? process.env.DB_LOGGIN : true,
-    logger: process.env.DB_LOGGER || 'advanced-console',
+    
   },
 });

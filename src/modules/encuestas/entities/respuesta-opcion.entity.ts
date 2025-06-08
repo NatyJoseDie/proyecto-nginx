@@ -1,4 +1,5 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Exclude, Expose } from 'class-transformer';
 
 import { Opcion } from './opcion.entity';
 import { Respuesta } from './respuesta.entity';
@@ -10,7 +11,6 @@ export class RespuestaOpcion {
 
   @ManyToOne(() => Respuesta, (respuesta) => respuesta.respuestasOpciones, {
     onDelete: 'CASCADE',
-    cascade: ['insert'],
   })
   @JoinColumn({ name: 'id_respuesta' })
   respuesta: Respuesta;
@@ -20,4 +20,14 @@ export class RespuestaOpcion {
   })
   @JoinColumn({ name: 'id_opcion' })
   opcion: Opcion;
+
+  @Expose()
+  get opcionId(): number {
+    return this.opcion?.id;
+  }
+
+  @Expose()
+  get preguntaId(): number {
+    return this.opcion?.pregunta?.id;
+  }
 }

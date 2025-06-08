@@ -5,20 +5,42 @@ import { Encuesta } from '../entities/encuesta.entity';
 import { CodigoTipoEnum } from '../enums/codigo-tipo.enum';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
 import { v4 } from 'uuid';
-import { EstadisticasDto } from '../dtos/estadisticas-resultados.dto';
+import { ResultadosDto } from '../dtos/resultados.dto';
+import { NubePalabrasService } from '../services/nube-palabras.service';
+import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
 
 @Injectable()
 export class EncuestasService {
   constructor(
     @InjectRepository(Encuesta)
     private encuestasRepository: Repository<Encuesta>,
+    private nubePalabrasService: NubePalabrasService,
   ) {}
+
+  async obtenerTodas(): Promise<Encuesta[]> {
+    return await this.encuestasRepository.find({
+      relations: ['preguntas', 'preguntas.opciones'],
+    });
+  }
 
   async crearEncuesta(dto: CreateEncuestaDTO): Promise<{
     id: number;
     codigoRespuesta: string;
     codigoResultados: string;
   }> {
+    // ✅ Agregar opciones automáticamente si la pregunta es de tipo VERDADERO_FALSO
+    for (const pregunta of dto.preguntas) {
+      if (
+        pregunta.tipo === 'VERDADERO_FALSO' &&
+        (!pregunta.opciones || pregunta.opciones.length === 0)
+      ) {
+        pregunta.opciones = [
+          { texto: 'Verdadero', numero: 1 },
+          { texto: 'Falso', numero: 2 },
+        ];
+      }
+    }
+
     const encuesta: Encuesta = this.encuestasRepository.create({
       ...dto,
       codigoRespuesta: v4(),
@@ -88,16 +110,17 @@ export class EncuestasService {
     }
     return encuesta;
   }
-  async obtenerEstadisticaEncuesta(
+
+  async obtenerResultadosEncuesta(
     id: number,
     codigo: string,
-  ): Promise<EstadisticasDto> {
+  ): Promise<ResultadosDto> {
     const query = this.encuestasRepository
       .createQueryBuilder('encuesta')
       .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
       .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
 
-      .innerJoinAndSelect('encuesta.respuestas', 'respuesta')
+      .leftJoinAndSelect('encuesta.respuestas', 'respuesta')
 
       .leftJoinAndSelect('respuesta.respuestasOpciones', 'respuestaOpcion')
       .leftJoinAndSelect('respuestaOpcion.opcion', 'opcionRespuesta')
@@ -109,6 +132,9 @@ export class EncuestasService {
       .leftJoinAndSelect('respuesta.respuestasAbiertas', 'respuestaAbierta')
       .leftJoinAndSelect('respuestaAbierta.pregunta', 'preguntaAbierta')
 
+      .leftJoinAndSelect('respuesta.respuestasVerdaderoFalso', 'respuestaVF')
+      .leftJoinAndSelect('respuestaVF.pregunta', 'preguntaVF')
+
       .where('encuesta.id = :id', { id });
 
     query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
@@ -117,12 +143,14 @@ export class EncuestasService {
     if (!encuesta) {
       throw new BadRequestException('Datos de encuesta no válidos');
     }
+    let resultados = this.mapearResultados(encuesta);
+    this.agregarNubePalabras(resultados);
 
-    return this.crearEstadisticas(encuesta);
+    return resultados;
   }
 
-  private crearEstadisticas(encuesta: Encuesta): EstadisticasDto {
-    const dto: EstadisticasDto = {
+  private mapearResultados(encuesta: Encuesta): ResultadosDto {
+    const dto: ResultadosDto = {
       id: encuesta.id,
       nombre: encuesta.nombre,
       codigoRespuesta: encuesta.codigoRespuesta,
@@ -134,7 +162,10 @@ export class EncuestasService {
         opciones: p.opciones || [],
         respuestasOpciones: [],
         respuestasAbiertas: [],
+        respuestasVF: [],
+        frecuenciaPalabras: [],
       })),
+      respuestas: [],
     };
 
     for (const respuesta of encuesta.respuestas || []) {
@@ -155,6 +186,33 @@ export class EncuestasService {
             });
           }
         }
+
+        const respuestaEncuestado = dto.respuestas.find(
+          (r) => r.id === respuesta.id,
+        );
+        if (respuestaEncuestado) {
+          const preguntaRespuesta = respuestaEncuestado.respuestas.find(
+            (p) => p.preguntaId === ro.preguntaId,
+          );
+          if (preguntaRespuesta) {
+            preguntaRespuesta.textoRespuesta.push(ro.opcion.texto);
+          } else {
+            respuestaEncuestado.respuestas.push({
+              preguntaId: ro.preguntaId,
+              textoRespuesta: [ro.opcion.texto],
+            });
+          }
+        } else {
+          dto.respuestas.push({
+            id: respuesta.id,
+            respuestas: [
+              {
+                preguntaId: ro.preguntaId,
+                textoRespuesta: [ro.opcion.texto],
+              },
+            ],
+          });
+        }
       }
       for (const ra of respuesta.respuestasAbiertas || []) {
         const pregunta = dto.preguntas.find((p) => p.id === ra.preguntaId);
@@ -164,9 +222,78 @@ export class EncuestasService {
             texto: ra.texto,
           });
         }
+        const respuestaEncuestado = dto.respuestas.find(
+          (r) => r.id === respuesta.id,
+        );
+        if (respuestaEncuestado) {
+          respuestaEncuestado.respuestas.push({
+            preguntaId: ra.preguntaId,
+            textoRespuesta: [ra.texto],
+          });
+        } else {
+          dto.respuestas.push({
+            id: respuesta.id,
+            respuestas: [
+              {
+                preguntaId: ra.preguntaId,
+                textoRespuesta: [ra.texto],
+              },
+            ],
+          });
+        }
+      }
+      for (const rvf of respuesta.respuestasVerdaderoFalso || []) {
+        const pregunta = dto.preguntas.find((p) => p.id === rvf.pregunta.id);
+        if (pregunta) {
+          const conteo = pregunta.respuestasVF.find(
+            (r) => rvf.valor === r.valor,
+          );
+          if (conteo) {
+            conteo.cantidad += 1;
+          } else {
+            pregunta.respuestasVF.push({
+              id: rvf.id,
+              valor: rvf.valor,
+              cantidad: 1,
+            });
+          }
+        }
+
+        const respuestaEncuestado = dto.respuestas.find(
+          (r) => r.id === respuesta.id,
+        );
+        if (respuestaEncuestado) {
+          respuestaEncuestado.respuestas.push({
+            preguntaId: rvf.pregunta.id,
+            textoRespuesta: [rvf.valor ? 'Verdadero' : 'Falso'],
+          });
+        } else {
+          dto.respuestas.push({
+            id: respuesta.id,
+            respuestas: [
+              {
+                preguntaId: rvf.pregunta.id,
+                textoRespuesta: [rvf.valor ? 'Verdadero' : 'Falso'],
+              },
+            ],
+          });
+        }
       }
     }
 
     return dto;
+  }
+
+  private agregarNubePalabras(resultados: ResultadosDto): void {
+    for (const pregunta of resultados.preguntas || []) {
+      if (pregunta.tipo === TiposRespuestaEnum.ABIERTA) {
+        pregunta.frecuenciaPalabras =
+          this.nubePalabrasService.generarNubePalabras(
+            pregunta.respuestasAbiertas.map((ra) => {
+              return ra.texto;
+            }),
+          );
+      }
+    }
   }
 }

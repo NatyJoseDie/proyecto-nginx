@@ -8,11 +8,10 @@ import {
   Patch,
 } from '@nestjs/common';
 
+import { UpdatePreguntaDto } from '../dtos/update-pregunta.dto';
+import { ApiTags } from '@nestjs/swagger';
 import { PreguntasService } from '../services/preguntas.service';
 import { CreatePreguntaDTO } from '../dtos/create-pregunta.dto';
-
-import { UpdatePreguntaDTO } from '../dtos/update-pregunta.dto';
-import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Preguntas')
 @Controller('preguntas')
@@ -38,7 +37,7 @@ export class PreguntasController {
   update(
     @Param('id') id: number,
 
-    @Body() updatePreguntaDTO: UpdatePreguntaDTO,
+    @Body() updatePreguntaDTO: UpdatePreguntaDto,
   ) {
     return this.preguntasService.update(id, updatePreguntaDTO);
   }
