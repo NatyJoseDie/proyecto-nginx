@@ -42,7 +42,10 @@ export class EncuestasController {
 
     );
   }
-
+  @Get("paginate/:id")
+  paginate() {
+    return ({ ok: "paginate" })
+  }
   @Get('/resultados/:id')
   async obtenerResultadosEncuesta(
     @Param('id') id: number,
