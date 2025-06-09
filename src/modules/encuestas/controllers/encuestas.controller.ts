@@ -14,7 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('Encuestas')
 @Controller('encuestas')
 export class EncuestasController {
-  constructor(private encuestasService: EncuestasService) {}
+  constructor(private encuestasService: EncuestasService) { }
 
   @Get()
   async obtenerTodasLasEncuestas(): Promise<Encuesta[]> {
@@ -39,6 +39,7 @@ export class EncuestasController {
       id,
       dto.codigo,
       dto.tipo,
+
     );
   }
 

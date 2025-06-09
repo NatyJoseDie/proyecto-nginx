@@ -20,12 +20,20 @@ export class PreguntasService {
     private readonly preguntaRepository: Repository<Pregunta>,
     @InjectRepository(Opcion)
     private readonly opcionRepository: Repository<Opcion>,
-  ) {}
+  ) { }
 
   async findAll() {
     return await this.preguntaRepository.find({
       relations: ['opciones'],
     });
+  }
+  async executePreguntaPagination(page: number, limit: number = 4) {
+    const query = this.preguntaRepository.createQueryBuilder("pregunta")
+    query.innerJoinAndSelect("pregunta.opciones", "opciones")
+      .where("").orderBy("pregunta.id")
+      .skip(limit * (page - 1)).limit(limit + 1)
+
+    return await query.getMany()
   }
 
   async findOne(id: number) {

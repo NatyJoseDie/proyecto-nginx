@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Encuesta } from '../entities/encuesta.entity';
@@ -8,6 +8,7 @@ import { v4 } from 'uuid';
 import { ResultadosDto } from '../dtos/resultados.dto';
 import { NubePalabrasService } from '../services/nube-palabras.service';
 import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
+import { PaginationResult } from '../controllers/preguntas.controller';
 
 @Injectable()
 export class EncuestasService {
@@ -15,7 +16,7 @@ export class EncuestasService {
     @InjectRepository(Encuesta)
     private encuestasRepository: Repository<Encuesta>,
     private nubePalabrasService: NubePalabrasService,
-  ) {}
+  ) { }
 
   async obtenerTodas(): Promise<Encuesta[]> {
     return await this.encuestasRepository.find({
@@ -59,7 +60,9 @@ export class EncuestasService {
     id: number,
     codigo: string,
     codigoTipo: CodigoTipoEnum.RESPUESTA | CodigoTipoEnum.RESULTADOS,
-  ): Promise<Encuesta> {
+
+  ):
+    Promise<Encuesta> {
     let query: SelectQueryBuilder<Encuesta>;
 
     switch (codigoTipo) {
@@ -97,6 +100,7 @@ export class EncuestasService {
           )
           .where('encuesta.id = :id', { id });
         query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
+
         break;
     }
 
