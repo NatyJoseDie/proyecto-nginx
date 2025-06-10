@@ -51,4 +51,5 @@ export class ResultadosDto {
   preguntas: PreguntaDto[];
   respuestas: RespuestaEncuestadoDto[];
   codigoRespuesta: string;
+  activa: boolean;
 }

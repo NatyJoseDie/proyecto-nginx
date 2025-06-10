@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Res, Post, Param, Query, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Res,
+  Post,
+  Param,
+  Query,
+  ParseIntPipe,
+  DefaultValuePipe,
+  Patch,
+} from '@nestjs/common';
 
 import { EncuestasService } from '../services/encuestas.service';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
@@ -15,7 +26,7 @@ import { PaginationResult } from '../interfaces/paginationResult';
 @ApiTags('Encuestas')
 @Controller('encuestas')
 export class EncuestasController {
-  constructor(private encuestasService: EncuestasService) { }
+  constructor(private encuestasService: EncuestasService) {}
 
   @Get()
   async obtenerTodasLasEncuestas(): Promise<Encuesta[]> {
@@ -29,6 +40,21 @@ export class EncuestasController {
     codigoResultados: string;
   }> {
     return await this.encuestasService.crearEncuesta(dto);
+  }
+
+  @Patch(':id/estado')
+  async cambiarEstadoEncuesta(
+    @Param('id') id: number,
+    @Query() dto: CodigoDTO,
+    @Body('activa') activa: boolean,
+  ): Promise<{
+    mensaje: string;
+  }> {
+    return await this.encuestasService.cambiarEstadoEncuesta(
+      id,
+      dto.codigo,
+      activa,
+    );
   }
 
   @Get(':id')
@@ -47,15 +73,14 @@ export class EncuestasController {
   async obtenerResultadosEncuesta(
     @Param('id') id: number,
     @Query() dto: CodigoDTO,
-    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
   ): Promise<PaginationResult<ResultadosDto>> {
     return await this.encuestasService.obtenerResultadosEncuesta(
       id,
       dto.codigo,
-      page
+      page,
     );
   }
-
 
   @Get('/resultados/:id/csv')
   async exportarCSV(
@@ -63,11 +88,9 @@ export class EncuestasController {
     @Param('id') id: number,
     @Query() dto: CodigoDTO,
   ) {
-    const encuesta = (await this.encuestasService.obtenerResultadosEncuesta(
-      id,
-      dto.codigo,
-      1
-    )).data;
+    const encuesta = (
+      await this.encuestasService.obtenerResultadosEncuesta(id, dto.codigo, 1)
+    ).data;
 
     const preguntasMap = new Map<number, string>();
     for (const p of encuesta.preguntas) {
