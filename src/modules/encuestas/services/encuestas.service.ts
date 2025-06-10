@@ -9,16 +9,18 @@ import { ResultadosDto } from '../dtos/resultados.dto';
 import { NubePalabrasService } from '../services/nube-palabras.service';
 import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
 import { PaginationResult } from '../interfaces/paginationResult';
-import { Pregunta } from '../entities/pregunta.entity';
+import { ResultadosGraficosDto } from '../dtos/resultados.graficos.dto';
+import { Respuesta } from '../entities/respuesta.entity';
 
 @Injectable()
 export class EncuestasService {
   constructor(
     @InjectRepository(Encuesta)
     private encuestasRepository: Repository<Encuesta>,
+    @InjectRepository(Respuesta)
+    private respuestasRepository: Repository<Respuesta>,
     private nubePalabrasService: NubePalabrasService,
-    @InjectRepository(Pregunta) private readonly preguntaRepository: Repository<Pregunta>
-  ) { }
+  ) {}
 
   async obtenerTodas(): Promise<Encuesta[]> {
     return await this.encuestasRepository.find({
@@ -135,74 +137,24 @@ export class EncuestasService {
     return encuesta;
   }
 
-  async obtenerResultadosEncuesta(
-    id: number,
-    codigo: string,
-    page: number,
-    limit = 0
-  ): Promise<PaginationResult<ResultadosDto>> {
-
-    const preguntas = await this.preguntaRepository
-      .createQueryBuilder('pregunta')
-      .where('pregunta.id_encuesta = :id', { id })
-      .orderBy("pregunta.numero")
-      .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
-      .skip((page - 1) * limit)
-      .take(5)
-      .getMany();
-    const query = this.encuestasRepository
-      .createQueryBuilder('encuesta')
-      .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
-
-      .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
-
-      .leftJoinAndSelect('encuesta.respuestas', 'respuesta')
-
-      .leftJoinAndSelect('respuesta.respuestasOpciones', 'respuestaOpcion')
-      .leftJoinAndSelect('respuestaOpcion.opcion', 'opcionRespuesta')
-      .leftJoinAndSelect(
-        'opcionRespuesta.pregunta',
-        'preguntaDeOpcionRespuesta',
-      )
-
-      .leftJoinAndSelect('respuesta.respuestasAbiertas', 'respuestaAbierta')
-      .leftJoinAndSelect('respuestaAbierta.pregunta', 'preguntaAbierta')
-
-      .leftJoinAndSelect('respuesta.respuestasVerdaderoFalso', 'respuestaVF')
-      .leftJoinAndSelect('respuestaVF.pregunta', 'preguntaVF')
-
-      .where('encuesta.id = :id', { id });
-
-    query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
-    const encuesta = await query.getOne();
-    let isNext = false
-    if (preguntas.length > 4) {
-      isNext = true
-      preguntas.pop()
-    }
-    const isPrev = page !== 1
-    if (encuesta) {
-      encuesta.preguntas = preguntas
-    }
-    if (!encuesta) {
-      throw new BadRequestException('Datos de encuesta no válidos');
-    }
-
-    let resultados = this.mapearResultados(encuesta);
-    this.agregarNubePalabras(resultados);
-
-    return ({ data: resultados, prev: isPrev, next: isNext });
-  }
   // async obtenerResultadosEncuesta(
   //   id: number,
   //   codigo: string,
   //   page: number,
-  //   limit = 0
+  //   limit = 0,
   // ): Promise<PaginationResult<ResultadosDto>> {
+  //   const preguntas = await this.preguntaRepository
+  //     .createQueryBuilder('pregunta')
+  //     .where('pregunta.id_encuesta = :id', { id })
+  //     .orderBy('pregunta.numero')
+  //     .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
+  //     .skip((page - 1) * limit)
+  //     .take(5)
+  //     .getMany();
   //   const query = this.encuestasRepository
   //     .createQueryBuilder('encuesta')
   //     .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
-  //     .take(4)
+
   //     .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
 
   //     .leftJoinAndSelect('encuesta.respuestas', 'respuesta')
@@ -224,21 +176,81 @@ export class EncuestasService {
 
   //   query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
   //   const encuesta = await query.getOne();
-
+  //   let isNext = false;
+  //   if (preguntas.length > 4) {
+  //     isNext = true;
+  //     preguntas.pop();
+  //   }
+  //   const isPrev = page !== 1;
+  //   if (encuesta) {
+  //     encuesta.preguntas = preguntas;
+  //   }
   //   if (!encuesta) {
   //     throw new BadRequestException('Datos de encuesta no válidos');
   //   }
-  //   let isNext = false
-  //   if (encuesta.respuestas.length > limit) {
-  //     isNext = true
-  //     encuesta.respuestas.pop()
-  //   }
-  //   const isPrev = page !== 1
-  //   let resultados = this.mapearResultados(encuesta);
-  //   this.agregarNubePalabras(resultados);
 
-  //   return ({ data: resultados, prev: isPrev, next: isNext });
+  //   let resultados = this.mapearResultados(encuesta);
+
+  //   return { data: resultados, prev: isPrev, next: isNext };
   // }
+
+  /// *** TABLA ***
+
+  async obtenerResultadosEncuesta(
+    id: number,
+    codigo: string,
+    page: number,
+    limit = 2,
+  ): Promise<PaginationResult<ResultadosDto>> {
+    const encuesta = await this.encuestasRepository
+      .createQueryBuilder('encuesta')
+      .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
+      .where('encuesta.id = :id', { id })
+      .andWhere('encuesta.codigoResultados= :codigo', { codigo })
+      .orderBy('pregunta.numero')
+      .getOne();
+
+    const respuestasPaginadas = await this.respuestasRepository
+      .createQueryBuilder('respuesta')
+      .innerJoinAndSelect('respuesta.encuesta', 'encuesta')
+
+      .leftJoinAndSelect('respuesta.respuestasOpciones', 'respuestaOpcion')
+      .leftJoinAndSelect('respuestaOpcion.opcion', 'opcionRespuesta')
+      .leftJoinAndSelect(
+        'opcionRespuesta.pregunta',
+        'preguntaDeOpcionRespuesta',
+      )
+
+      .leftJoinAndSelect('respuesta.respuestasAbiertas', 'respuestaAbierta')
+      .leftJoinAndSelect('respuestaAbierta.pregunta', 'preguntaAbierta')
+
+      .leftJoinAndSelect('respuesta.respuestasVerdaderoFalso', 'respuestaVF')
+      .leftJoinAndSelect('respuestaVF.pregunta', 'preguntaVF')
+
+      .where('encuesta.id = :id', { id })
+      .andWhere('encuesta.codigoResultados= :codigo', { codigo })
+      .skip((page - 1) * limit)
+      .take(limit + 1)
+      .getMany();
+
+    let isNext = false;
+    if (respuestasPaginadas.length > limit) {
+      isNext = true;
+      respuestasPaginadas.pop();
+    }
+    const isPrev = page !== 1;
+
+    if (encuesta) {
+      encuesta.respuestas = respuestasPaginadas;
+    }
+    if (!encuesta) {
+      throw new BadRequestException('Datos de encuesta no válidos');
+    }
+
+    let resultados = this.mapearResultados(encuesta);
+
+    return { data: resultados, prev: isPrev, next: isNext };
+  }
 
   private mapearResultados(encuesta: Encuesta): ResultadosDto {
     const dto: ResultadosDto = {
@@ -250,35 +262,12 @@ export class EncuestasService {
         numero: p.numero,
         texto: p.texto,
         tipo: p.tipo,
-        opciones: p.opciones || [],
-        respuestasOpciones: [],
-        respuestasAbiertas: [],
-        respuestasVF: [],
-        frecuenciaPalabras: [],
       })),
       respuestas: [],
-      activa: encuesta.activa,
     };
 
     for (const respuesta of encuesta.respuestas || []) {
       for (const ro of respuesta.respuestasOpciones || []) {
-        const pregunta = dto.preguntas.find((p) => p.id === ro.preguntaId);
-        if (pregunta) {
-          // Buscar si ya existe conteo para esa opción
-          const conteo = pregunta.respuestasOpciones.find(
-            (r) => r.opcionId === ro.opcionId,
-          );
-          if (conteo) {
-            conteo.cantidad += 1;
-          } else {
-            pregunta.respuestasOpciones.push({
-              id: ro.id,
-              opcionId: ro.opcionId,
-              cantidad: 1,
-            });
-          }
-        }
-
         const respuestaEncuestado = dto.respuestas.find(
           (r) => r.id === respuesta.id,
         );
@@ -307,13 +296,6 @@ export class EncuestasService {
         }
       }
       for (const ra of respuesta.respuestasAbiertas || []) {
-        const pregunta = dto.preguntas.find((p) => p.id === ra.preguntaId);
-        if (pregunta) {
-          pregunta.respuestasAbiertas.push({
-            id: ra.id,
-            texto: ra.texto,
-          });
-        }
         const respuestaEncuestado = dto.respuestas.find(
           (r) => r.id === respuesta.id,
         );
@@ -335,22 +317,6 @@ export class EncuestasService {
         }
       }
       for (const rvf of respuesta.respuestasVerdaderoFalso || []) {
-        const pregunta = dto.preguntas.find((p) => p.id === rvf.pregunta.id);
-        if (pregunta) {
-          const conteo = pregunta.respuestasVF.find(
-            (r) => rvf.valor === r.valor,
-          );
-          if (conteo) {
-            conteo.cantidad += 1;
-          } else {
-            pregunta.respuestasVF.push({
-              id: rvf.id,
-              valor: rvf.valor,
-              cantidad: 1,
-            });
-          }
-        }
-
         const respuestaEncuestado = dto.respuestas.find(
           (r) => r.id === respuesta.id,
         );
@@ -376,7 +342,119 @@ export class EncuestasService {
     return dto;
   }
 
-  private agregarNubePalabras(resultados: ResultadosDto): void {
+  /// *** GRÁFICOS ***
+
+  async obtenerResultadosGraficoEncuesta(
+    id: number,
+    codigo: string,
+  ): Promise<ResultadosGraficosDto> {
+    const query = this.encuestasRepository
+      .createQueryBuilder('encuesta')
+      .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
+      .take(4)
+      .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
+
+      .leftJoinAndSelect('encuesta.respuestas', 'respuesta')
+
+      .leftJoinAndSelect('respuesta.respuestasOpciones', 'respuestaOpcion')
+      .leftJoinAndSelect('respuestaOpcion.opcion', 'opcionRespuesta')
+      .leftJoinAndSelect(
+        'opcionRespuesta.pregunta',
+        'preguntaDeOpcionRespuesta',
+      )
+
+      .leftJoinAndSelect('respuesta.respuestasAbiertas', 'respuestaAbierta')
+      .leftJoinAndSelect('respuestaAbierta.pregunta', 'preguntaAbierta')
+
+      .leftJoinAndSelect('respuesta.respuestasVerdaderoFalso', 'respuestaVF')
+      .leftJoinAndSelect('respuestaVF.pregunta', 'preguntaVF')
+
+      .orderBy('pregunta.numero')
+
+      .where('encuesta.id = :id', { id });
+
+    query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
+    const encuesta = await query.getOne();
+
+    if (!encuesta) {
+      throw new BadRequestException('Datos de encuesta no válidos');
+    }
+    let resultados = this.mapearResultadosGrafico(encuesta);
+    this.agregarNubePalabras(resultados);
+
+    return resultados;
+  }
+
+  private mapearResultadosGrafico(encuesta: Encuesta): ResultadosGraficosDto {
+    const dto: ResultadosGraficosDto = {
+      id: encuesta.id,
+      nombre: encuesta.nombre,
+      codigoRespuesta: encuesta.codigoRespuesta,
+      preguntas: encuesta.preguntas.map((p) => ({
+        id: p.id,
+        numero: p.numero,
+        texto: p.texto,
+        tipo: p.tipo,
+        opciones: p.opciones || [],
+        respuestasOpciones: [],
+        respuestasAbiertas: [],
+        respuestasVF: [],
+        frecuenciaPalabras: [],
+      })),
+      activa: encuesta.activa,
+    };
+
+    for (const respuesta of encuesta.respuestas || []) {
+      for (const ro of respuesta.respuestasOpciones || []) {
+        const pregunta = dto.preguntas.find((p) => p.id === ro.preguntaId);
+        if (pregunta) {
+          // Buscar si ya existe conteo para esa opción
+          const conteo = pregunta.respuestasOpciones.find(
+            (r) => r.opcionId === ro.opcionId,
+          );
+          if (conteo) {
+            conteo.cantidad += 1;
+          } else {
+            pregunta.respuestasOpciones.push({
+              id: ro.id,
+              opcionId: ro.opcionId,
+              cantidad: 1,
+            });
+          }
+        }
+      }
+      for (const ra of respuesta.respuestasAbiertas || []) {
+        const pregunta = dto.preguntas.find((p) => p.id === ra.preguntaId);
+        if (pregunta) {
+          pregunta.respuestasAbiertas.push({
+            id: ra.id,
+            texto: ra.texto,
+          });
+        }
+      }
+      for (const rvf of respuesta.respuestasVerdaderoFalso || []) {
+        const pregunta = dto.preguntas.find((p) => p.id === rvf.pregunta.id);
+        if (pregunta) {
+          const conteo = pregunta.respuestasVF.find(
+            (r) => rvf.valor === r.valor,
+          );
+          if (conteo) {
+            conteo.cantidad += 1;
+          } else {
+            pregunta.respuestasVF.push({
+              id: rvf.id,
+              valor: rvf.valor,
+              cantidad: 1,
+            });
+          }
+        }
+      }
+    }
+
+    return dto;
+  }
+
+  private agregarNubePalabras(resultados: ResultadosGraficosDto): void {
     for (const pregunta of resultados.preguntas || []) {
       if (pregunta.tipo === TiposRespuestaEnum.ABIERTA) {
         pregunta.frecuenciaPalabras =

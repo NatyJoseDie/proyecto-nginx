@@ -26,6 +26,7 @@ import { parse } from 'json2csv';
 import { ApiTags } from '@nestjs/swagger';
 import { PaginationResult } from '../interfaces/paginationResult';
 import { CodigoDTODecorator } from '../decorators/codigoDto';
+import { ResultadosGraficosDto } from '../dtos/resultados.graficos.dto';
 @ApiTags('Encuestas')
 @Controller('encuestas')
 export class EncuestasController {
@@ -84,6 +85,19 @@ export class EncuestasController {
       codigo,
       page,
       4,
+    );
+  }
+
+  @UsePipes(new ValidationPipe({ forbidNonWhitelisted: false }))
+  @Get('/resultados/:id/graficos')
+  async obtenerResultadosGraficosEncuesta(
+    @Param('id') id: number,
+    @CodigoDTODecorator(new ValidationPipe({ transform: true }))
+    { codigo }: CodigoDTO,
+  ): Promise<ResultadosGraficosDto> {
+    return await this.encuestasService.obtenerResultadosGraficoEncuesta(
+      id,
+      codigo,
     );
   }
 
