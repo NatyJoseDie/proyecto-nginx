@@ -56,6 +56,27 @@ export class EncuestasService {
     };
   }
 
+  async cambiarEstadoEncuesta(
+    idEncuesta: number,
+    codigo: string,
+    activa: boolean,
+  ): Promise<{ mensaje: string }> {
+    const query = this.encuestasRepository
+      .createQueryBuilder('encuesta')
+      .where('encuesta.id = :id', { id: idEncuesta });
+    query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
+    const encuesta = await query.getOne();
+
+    if (!encuesta) {
+      throw new BadRequestException('Datos de encuesta no válidos');
+    }
+    encuesta.activa = activa;
+    this.encuestasRepository.save(encuesta);
+    return {
+      mensaje: `La encuesta ha sido ${activa ? 'activada' : 'desactivada'}.`,
+    };
+  }
+
   async obtenerEncuesta(
     id: number,
     codigo: string,
@@ -170,6 +191,7 @@ export class EncuestasService {
         frecuenciaPalabras: [],
       })),
       respuestas: [],
+      activa: encuesta.activa,
     };
 
     for (const respuesta of encuesta.respuestas || []) {
