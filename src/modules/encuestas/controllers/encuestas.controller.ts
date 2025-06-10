@@ -1,4 +1,17 @@
-import { Body, Controller, Get, Res, Post, Param, Query, ParseIntPipe, DefaultValuePipe, ValidationPipe, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Res,
+  Post,
+  Param,
+  Query,
+  ParseIntPipe,
+  DefaultValuePipe,
+  ValidationPipe,
+  UsePipes,
+  Patch,
+} from '@nestjs/common';
 
 import { EncuestasService } from '../services/encuestas.service';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
@@ -16,7 +29,7 @@ import { CodigoDTODecorator } from '../decorators/codigoDto';
 @ApiTags('Encuestas')
 @Controller('encuestas')
 export class EncuestasController {
-  constructor(private encuestasService: EncuestasService) { }
+  constructor(private encuestasService: EncuestasService) {}
 
   @Get()
   async obtenerTodasLasEncuestas(): Promise<Encuesta[]> {
@@ -30,6 +43,21 @@ export class EncuestasController {
     codigoResultados: string;
   }> {
     return await this.encuestasService.crearEncuesta(dto);
+  }
+
+  @Patch(':id/estado')
+  async cambiarEstadoEncuesta(
+    @Param('id') id: number,
+    @Query() dto: CodigoDTO,
+    @Body('activa') activa: boolean,
+  ): Promise<{
+    mensaje: string;
+  }> {
+    return await this.encuestasService.cambiarEstadoEncuesta(
+      id,
+      dto.codigo,
+      activa,
+    );
   }
 
   @Get(':id')
@@ -47,20 +75,17 @@ export class EncuestasController {
   @Get('/resultados/:id')
   async obtenerResultadosEncuesta(
     @Param('id') id: number,
-    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @CodigoDTODecorator(new ValidationPipe({ transform: true })) { codigo }: CodigoDTO
-
-
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @CodigoDTODecorator(new ValidationPipe({ transform: true }))
+    { codigo }: CodigoDTO,
   ): Promise<PaginationResult<ResultadosDto>> {
-
     return await this.encuestasService.obtenerResultadosEncuesta(
       id,
       codigo,
       page,
-      4
+      4,
     );
   }
-
 
   @Get('/resultados/:id/csv')
   async exportarCSV(
@@ -68,11 +93,9 @@ export class EncuestasController {
     @Param('id') id: number,
     @Query() dto: CodigoDTO,
   ) {
-    const encuesta = (await this.encuestasService.obtenerResultadosEncuesta(
-      id,
-      dto.codigo,
-      0
-    )).data;
+    const encuesta = (
+      await this.encuestasService.obtenerResultadosEncuesta(id, dto.codigo, 0)
+    ).data;
 
     const preguntasMap = new Map<number, string>();
     for (const p of encuesta.preguntas) {
