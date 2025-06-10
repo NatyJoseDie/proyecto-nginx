@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Res, Post, Param, Query, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
+import { Body, Controller, Get, Res, Post, Param, Query, ParseIntPipe, DefaultValuePipe, ValidationPipe, UsePipes } from '@nestjs/common';
 
 import { EncuestasService } from '../services/encuestas.service';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
@@ -12,6 +12,7 @@ import { parse } from 'json2csv';
 
 import { ApiTags } from '@nestjs/swagger';
 import { PaginationResult } from '../interfaces/paginationResult';
+import { CodigoDTODecorator } from '../decorators/codigoDto';
 @ApiTags('Encuestas')
 @Controller('encuestas')
 export class EncuestasController {
@@ -42,17 +43,21 @@ export class EncuestasController {
       dto.tipo,
     );
   }
-
+  @UsePipes(new ValidationPipe({ forbidNonWhitelisted: false }))
   @Get('/resultados/:id')
   async obtenerResultadosEncuesta(
     @Param('id') id: number,
-    @Query() dto: CodigoDTO,
-    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number
+    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @CodigoDTODecorator(new ValidationPipe({ transform: true })) { codigo }: CodigoDTO
+
+
   ): Promise<PaginationResult<ResultadosDto>> {
+
     return await this.encuestasService.obtenerResultadosEncuesta(
       id,
-      dto.codigo,
-      page
+      codigo,
+      page,
+      4
     );
   }
 
@@ -66,7 +71,7 @@ export class EncuestasController {
     const encuesta = (await this.encuestasService.obtenerResultadosEncuesta(
       id,
       dto.codigo,
-      1
+      0
     )).data;
 
     const preguntasMap = new Map<number, string>();
