@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Res, Post, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Res, Post, Param, Query, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
 
 import { EncuestasService } from '../services/encuestas.service';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
@@ -11,10 +11,11 @@ import { Response } from 'express';
 import { parse } from 'json2csv';
 
 import { ApiTags } from '@nestjs/swagger';
+import { PaginationResult } from '../interfaces/paginationResult';
 @ApiTags('Encuestas')
 @Controller('encuestas')
 export class EncuestasController {
-  constructor(private encuestasService: EncuestasService) {}
+  constructor(private encuestasService: EncuestasService) { }
 
   @Get()
   async obtenerTodasLasEncuestas(): Promise<Encuesta[]> {
@@ -46,12 +47,15 @@ export class EncuestasController {
   async obtenerResultadosEncuesta(
     @Param('id') id: number,
     @Query() dto: CodigoDTO,
-  ): Promise<ResultadosDto> {
+    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number
+  ): Promise<PaginationResult<ResultadosDto>> {
     return await this.encuestasService.obtenerResultadosEncuesta(
       id,
       dto.codigo,
+      page
     );
   }
+
 
   @Get('/resultados/:id/csv')
   async exportarCSV(
@@ -59,10 +63,11 @@ export class EncuestasController {
     @Param('id') id: number,
     @Query() dto: CodigoDTO,
   ) {
-    const encuesta = await this.encuestasService.obtenerResultadosEncuesta(
+    const encuesta = (await this.encuestasService.obtenerResultadosEncuesta(
       id,
       dto.codigo,
-    );
+      1
+    )).data;
 
     const preguntasMap = new Map<number, string>();
     for (const p of encuesta.preguntas) {

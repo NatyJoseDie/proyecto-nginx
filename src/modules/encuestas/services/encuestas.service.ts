@@ -8,6 +8,7 @@ import { v4 } from 'uuid';
 import { ResultadosDto } from '../dtos/resultados.dto';
 import { NubePalabrasService } from '../services/nube-palabras.service';
 import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
+import { PaginationResult } from '../interfaces/paginationResult';
 
 @Injectable()
 export class EncuestasService {
@@ -15,7 +16,7 @@ export class EncuestasService {
     @InjectRepository(Encuesta)
     private encuestasRepository: Repository<Encuesta>,
     private nubePalabrasService: NubePalabrasService,
-  ) {}
+  ) { }
 
   async obtenerTodas(): Promise<Encuesta[]> {
     return await this.encuestasRepository.find({
@@ -114,10 +115,13 @@ export class EncuestasService {
   async obtenerResultadosEncuesta(
     id: number,
     codigo: string,
-  ): Promise<ResultadosDto> {
+    page: number,
+    limit = 0
+  ): Promise<PaginationResult<ResultadosDto>> {
     const query = this.encuestasRepository
       .createQueryBuilder('encuesta')
       .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
+      .orderBy("pregunta.numero", "ASC").limit(page)
       .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
 
       .leftJoinAndSelect('encuesta.respuestas', 'respuesta')
@@ -146,7 +150,7 @@ export class EncuestasService {
     let resultados = this.mapearResultados(encuesta);
     this.agregarNubePalabras(resultados);
 
-    return resultados;
+    return ({ data: resultados, prev: true, next: true });
   }
 
   private mapearResultados(encuesta: Encuesta): ResultadosDto {
