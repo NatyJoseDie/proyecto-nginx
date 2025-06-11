@@ -9,6 +9,7 @@ import { CodigoDTO } from '../dtos/obtener-resultados-dto';
 import { ResultadosDto } from '../dtos/resultados.dto';
 import { Response } from 'express';
 import { parse } from 'json2csv';
+import { PaginationResult } from '../interfaces/paginationResult'; // Import PaginationResult
 
 import { ApiTags } from '@nestjs/swagger';
 @ApiTags('Encuestas')
@@ -46,10 +47,14 @@ export class EncuestasController {
   async obtenerResultadosEncuesta(
     @Param('id') id: number,
     @Query() dto: CodigoDTO,
-  ): Promise<ResultadosDto> {
+    @Query('page') page: number = 1, // Add page query parameter, default to 1
+    @Query('limit') limit: number = 5, // Add limit query parameter, default to 5 (or your preferred default)
+  ): Promise<PaginationResult<ResultadosDto>> { // Update return type
     return await this.encuestasService.obtenerResultadosEncuesta(
       id,
       dto.codigo,
+      page, // Pass page
+      limit, // Pass limit
     );
   }
 
@@ -58,30 +63,44 @@ export class EncuestasController {
     @Res() res: Response,
     @Param('id') id: number,
     @Query() dto: CodigoDTO,
+    // Assuming CSV export should fetch all results, not paginated
+    // If paginated CSV is needed, add page/limit here too
   ) {
-    const encuesta = await this.encuestasService.obtenerResultadosEncuesta(
+    // For CSV, we might want all data, so call a different service method or fetch all pages.
+    // For simplicity, let's assume we fetch the first page for now, or you adjust the service method.
+    // Ideally, you'd have a separate service method for exporting all results if that's the requirement.
+    const paginatedResultados = await this.encuestasService.obtenerResultadosEncuesta(
       id,
       dto.codigo,
+      1, // Default to page 1 for CSV or fetch all
+      0, // A limit of 0 or a very high number could signify 'all' in your service
     );
 
+    const encuestaResultados = paginatedResultados.data; // Access the data from the paginated result
+
     const preguntasMap = new Map<number, string>();
-    for (const p of encuesta.preguntas) {
-      preguntasMap.set(p.id, p.texto);
+    if (encuestaResultados && encuestaResultados.preguntas) {
+      for (const p of encuestaResultados.preguntas) {
+        preguntasMap.set(p.id, p.texto);
+      }
     }
 
-    const filas = encuesta.respuestas.map((respuesta: any, indice: number) => {
-      const fila: any = { id: indice + 1 };
+    let filas: any[] = []; // Especificamos el tipo explícitamente como any[]
+    if (encuestaResultados && encuestaResultados.respuestas) {
+      filas = encuestaResultados.respuestas.map((respuesta: any, indice: number) => {
+        const fila: any = { id: indice + 1 };
 
-      for (const r of respuesta.respuestas) {
-        const textoPregunta =
-          preguntasMap.get(r.preguntaId) || `Pregunta ${r.preguntaId}`;
-        fila[textoPregunta] = Array.isArray(r.textoRespuesta)
-          ? r.textoRespuesta.join(', ')
-          : r.textoRespuesta;
-      }
+        for (const r of respuesta.respuestas) {
+          const textoPregunta =
+            preguntasMap.get(r.preguntaId) || `Pregunta ${r.preguntaId}`;
+          fila[textoPregunta] = Array.isArray(r.textoRespuesta)
+            ? r.textoRespuesta.join(', ')
+            : r.textoRespuesta;
+        }
 
-      return fila;
-    });
+        return fila;
+      });
+    }
 
     const todosLosCampos = new Set<string>();
     filas.forEach((fila) => {

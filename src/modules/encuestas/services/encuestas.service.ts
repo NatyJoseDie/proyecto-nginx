@@ -8,6 +8,8 @@ import { v4 } from 'uuid';
 import { ResultadosDto } from '../dtos/resultados.dto';
 import { NubePalabrasService } from '../services/nube-palabras.service';
 import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
+import { PaginationResult } from '../interfaces/paginationResult';
+import { Pregunta } from '../entities/pregunta.entity';
 
 @Injectable()
 export class EncuestasService {
@@ -15,7 +17,8 @@ export class EncuestasService {
     @InjectRepository(Encuesta)
     private encuestasRepository: Repository<Encuesta>,
     private nubePalabrasService: NubePalabrasService,
-  ) {}
+    @InjectRepository(Pregunta) private readonly preguntaRepository: Repository<Pregunta>
+  ) { }
 
   async obtenerTodas(): Promise<Encuesta[]> {
     return await this.encuestasRepository.find({
@@ -52,6 +55,27 @@ export class EncuestasService {
       id: encuestaGuardada.id,
       codigoRespuesta: encuestaGuardada.codigoRespuesta,
       codigoResultados: encuestaGuardada.codigoResultados,
+    };
+  }
+
+  async cambiarEstadoEncuesta(
+    idEncuesta: number,
+    codigo: string,
+    activa: boolean,
+  ): Promise<{ mensaje: string }> {
+    const query = this.encuestasRepository
+      .createQueryBuilder('encuesta')
+      .where('encuesta.id = :id', { id: idEncuesta });
+    query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
+    const encuesta = await query.getOne();
+
+    if (!encuesta) {
+      throw new BadRequestException('Datos de encuesta no válidos');
+    }
+    encuesta.activa = activa;
+    this.encuestasRepository.save(encuesta);
+    return {
+      mensaje: `La encuesta ha sido ${activa ? 'activada' : 'desactivada'}.`,
     };
   }
 
@@ -114,10 +138,22 @@ export class EncuestasService {
   async obtenerResultadosEncuesta(
     id: number,
     codigo: string,
-  ): Promise<ResultadosDto> {
+    page: number,
+    limit = 0
+  ): Promise<PaginationResult<ResultadosDto>> {
+
+    const preguntas = await this.preguntaRepository
+      .createQueryBuilder('pregunta')
+      .where('pregunta.id_encuesta = :id', { id })
+      .orderBy("pregunta.numero")
+      .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
+      .skip((page - 1) * limit)
+      .take(5)
+      .getMany();
     const query = this.encuestasRepository
       .createQueryBuilder('encuesta')
       .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
+
       .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
 
       .leftJoinAndSelect('encuesta.respuestas', 'respuesta')
@@ -139,15 +175,70 @@ export class EncuestasService {
 
     query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
     const encuesta = await query.getOne();
-
+    let isNext = false
+    if (preguntas.length > 4) {
+      isNext = true
+      preguntas.pop()
+    }
+    const isPrev = page !== 1
+    if (encuesta) {
+      encuesta.preguntas = preguntas
+    }
     if (!encuesta) {
       throw new BadRequestException('Datos de encuesta no válidos');
     }
+
     let resultados = this.mapearResultados(encuesta);
     this.agregarNubePalabras(resultados);
 
-    return resultados;
+    return ({ data: resultados, prev: isPrev, next: isNext });
   }
+  // async obtenerResultadosEncuesta(
+  //   id: number,
+  //   codigo: string,
+  //   page: number,
+  //   limit = 0
+  // ): Promise<PaginationResult<ResultadosDto>> {
+  //   const query = this.encuestasRepository
+  //     .createQueryBuilder('encuesta')
+  //     .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
+  //     .take(4)
+  //     .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
+
+  //     .leftJoinAndSelect('encuesta.respuestas', 'respuesta')
+
+  //     .leftJoinAndSelect('respuesta.respuestasOpciones', 'respuestaOpcion')
+  //     .leftJoinAndSelect('respuestaOpcion.opcion', 'opcionRespuesta')
+  //     .leftJoinAndSelect(
+  //       'opcionRespuesta.pregunta',
+  //       'preguntaDeOpcionRespuesta',
+  //     )
+
+  //     .leftJoinAndSelect('respuesta.respuestasAbiertas', 'respuestaAbierta')
+  //     .leftJoinAndSelect('respuestaAbierta.pregunta', 'preguntaAbierta')
+
+  //     .leftJoinAndSelect('respuesta.respuestasVerdaderoFalso', 'respuestaVF')
+  //     .leftJoinAndSelect('respuestaVF.pregunta', 'preguntaVF')
+
+  //     .where('encuesta.id = :id', { id });
+
+  //   query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
+  //   const encuesta = await query.getOne();
+
+  //   if (!encuesta) {
+  //     throw new BadRequestException('Datos de encuesta no válidos');
+  //   }
+  //   let isNext = false
+  //   if (encuesta.respuestas.length > limit) {
+  //     isNext = true
+  //     encuesta.respuestas.pop()
+  //   }
+  //   const isPrev = page !== 1
+  //   let resultados = this.mapearResultados(encuesta);
+  //   this.agregarNubePalabras(resultados);
+
+  //   return ({ data: resultados, prev: isPrev, next: isNext });
+  // }
 
   private mapearResultados(encuesta: Encuesta): ResultadosDto {
     const dto: ResultadosDto = {
@@ -166,6 +257,7 @@ export class EncuestasService {
         frecuenciaPalabras: [],
       })),
       respuestas: [],
+ 
     };
 
     for (const respuesta of encuesta.respuestas || []) {
