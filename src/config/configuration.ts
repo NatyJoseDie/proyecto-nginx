@@ -8,6 +8,10 @@ export default () => ({
     username: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'root',
     name: process.env.DB_NAME || 'encuesta_web',
-    
+  },
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
+    apiKey: process.env.CLOUDINARY_API_KEY || '',
+    apiSecret: process.env.CLOUDINARY_API_SECRET || '',
   },
 });

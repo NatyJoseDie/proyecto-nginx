@@ -107,10 +107,9 @@ export class EncuestasController {
     @Param('id') id: number,
     @Query() dto: CodigoDTO,
   ) {
-    const encuesta = await this.encuestasService.obtenerResultadosEncuestaCSV(
-      id,
-      dto.codigo,
-    );
+    const encuesta = (
+      await this.encuestasService.obtenerResultadosEncuesta(id, dto.codigo, 0)
+    ).data;
 
     const preguntasMap = new Map<number, string>();
     for (const p of encuesta.preguntas) {
