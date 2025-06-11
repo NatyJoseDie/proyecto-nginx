@@ -9,12 +9,8 @@ import { ResultadosDto } from '../dtos/resultados.dto';
 import { NubePalabrasService } from '../services/nube-palabras.service';
 import { TiposRespuestaEnum } from '../enums/tipos-respuesta.enum';
 import { PaginationResult } from '../interfaces/paginationResult';
-<<<<<<< HEAD
-import { Pregunta } from '../entities/pregunta.entity';
-=======
 import { ResultadosGraficosDto } from '../dtos/resultados.graficos.dto';
 import { Respuesta } from '../entities/respuesta.entity';
->>>>>>> 5ced1b9aa5d94cdae741a699094c5d20fb344963
 
 @Injectable()
 export class EncuestasService {
@@ -24,8 +20,7 @@ export class EncuestasService {
     @InjectRepository(Respuesta)
     private respuestasRepository: Repository<Respuesta>,
     private nubePalabrasService: NubePalabrasService,
-    @InjectRepository(Pregunta) private readonly preguntaRepository: Repository<Pregunta>
-  ) { }
+  ) {}
 
   async obtenerTodas(): Promise<Encuesta[]> {
     return await this.encuestasRepository.find({
@@ -205,24 +200,6 @@ export class EncuestasService {
     id: number,
     codigo: string,
     page: number,
-<<<<<<< HEAD
-    limit = 0
-  ): Promise<PaginationResult<ResultadosDto>> {
-
-    const preguntas = await this.preguntaRepository
-      .createQueryBuilder('pregunta')
-      .where('pregunta.id_encuesta = :id', { id })
-      .orderBy("pregunta.numero")
-      .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
-      .skip((page - 1) * limit)
-      .take(5)
-      .getMany();
-    const query = this.encuestasRepository
-      .createQueryBuilder('encuesta')
-      .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
-
-      .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
-=======
     limit = 2,
   ): Promise<PaginationResult<ResultadosDto>> {
     const encuesta = await this.encuestasRepository
@@ -232,7 +209,6 @@ export class EncuestasService {
       .andWhere('encuesta.codigoResultados= :codigo', { codigo })
       .orderBy('pregunta.numero')
       .getOne();
->>>>>>> 5ced1b9aa5d94cdae741a699094c5d20fb344963
 
     const respuestasPaginadas = await this.respuestasRepository
       .createQueryBuilder('respuesta')
@@ -257,18 +233,6 @@ export class EncuestasService {
       .take(limit + 1)
       .getMany();
 
-<<<<<<< HEAD
-    query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
-    const encuesta = await query.getOne();
-    let isNext = false
-    if (preguntas.length > 4) {
-      isNext = true
-      preguntas.pop()
-    }
-    const isPrev = page !== 1
-    if (encuesta) {
-      encuesta.preguntas = preguntas
-=======
     let isNext = false;
     if (respuestasPaginadas.length > limit) {
       isNext = true;
@@ -278,70 +242,15 @@ export class EncuestasService {
 
     if (encuesta) {
       encuesta.respuestas = respuestasPaginadas;
->>>>>>> 5ced1b9aa5d94cdae741a699094c5d20fb344963
     }
     if (!encuesta) {
       throw new BadRequestException('Datos de encuesta no válidos');
     }
-<<<<<<< HEAD
-
-    let resultados = this.mapearResultados(encuesta);
-    this.agregarNubePalabras(resultados);
-
-    return ({ data: resultados, prev: isPrev, next: isNext });
-=======
 
     let resultados = this.mapearResultados(encuesta);
 
     return { data: resultados, prev: isPrev, next: isNext };
->>>>>>> 5ced1b9aa5d94cdae741a699094c5d20fb344963
   }
-  // async obtenerResultadosEncuesta(
-  //   id: number,
-  //   codigo: string,
-  //   page: number,
-  //   limit = 0
-  // ): Promise<PaginationResult<ResultadosDto>> {
-  //   const query = this.encuestasRepository
-  //     .createQueryBuilder('encuesta')
-  //     .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
-  //     .take(4)
-  //     .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
-
-  //     .leftJoinAndSelect('encuesta.respuestas', 'respuesta')
-
-  //     .leftJoinAndSelect('respuesta.respuestasOpciones', 'respuestaOpcion')
-  //     .leftJoinAndSelect('respuestaOpcion.opcion', 'opcionRespuesta')
-  //     .leftJoinAndSelect(
-  //       'opcionRespuesta.pregunta',
-  //       'preguntaDeOpcionRespuesta',
-  //     )
-
-  //     .leftJoinAndSelect('respuesta.respuestasAbiertas', 'respuestaAbierta')
-  //     .leftJoinAndSelect('respuestaAbierta.pregunta', 'preguntaAbierta')
-
-  //     .leftJoinAndSelect('respuesta.respuestasVerdaderoFalso', 'respuestaVF')
-  //     .leftJoinAndSelect('respuestaVF.pregunta', 'preguntaVF')
-
-  //     .where('encuesta.id = :id', { id });
-
-  //   query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
-  //   const encuesta = await query.getOne();
-
-  //   if (!encuesta) {
-  //     throw new BadRequestException('Datos de encuesta no válidos');
-  //   }
-  //   let isNext = false
-  //   if (encuesta.respuestas.length > limit) {
-  //     isNext = true
-  //     encuesta.respuestas.pop()
-  //   }
-  //   const isPrev = page !== 1
-  //   let resultados = this.mapearResultados(encuesta);
-  //   this.agregarNubePalabras(resultados);
-
-  //   return ({ data: resultados, prev: isPrev, next: isNext });
-  // }
 
   private mapearResultados(encuesta: Encuesta): ResultadosDto {
     const dto: ResultadosDto = {
@@ -355,7 +264,6 @@ export class EncuestasService {
         tipo: p.tipo,
       })),
       respuestas: [],
- 
     };
 
     for (const respuesta of encuesta.respuestas || []) {

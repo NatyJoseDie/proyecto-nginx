@@ -22,7 +22,6 @@ import { CodigoDTO } from '../dtos/obtener-resultados-dto';
 import { ResultadosDto } from '../dtos/resultados.dto';
 import { Response } from 'express';
 import { parse } from 'json2csv';
-import { PaginationResult } from '../interfaces/paginationResult'; // Import PaginationResult
 
 import { ApiTags } from '@nestjs/swagger';
 import { PaginationResult } from '../interfaces/paginationResult';
@@ -77,11 +76,28 @@ export class EncuestasController {
   @Get('/resultados/:id')
   async obtenerResultadosEncuesta(
     @Param('id') id: number,
-    @Query() dto: CodigoDTO,
-  ): Promise<ResultadosDto> {
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @CodigoDTODecorator(new ValidationPipe({ transform: true }))
+    { codigo }: CodigoDTO,
+  ): Promise<PaginationResult<ResultadosDto>> {
     return await this.encuestasService.obtenerResultadosEncuesta(
       id,
-      dto.codigo,
+      codigo,
+      page,
+      4,
+    );
+  }
+
+  @UsePipes(new ValidationPipe({ forbidNonWhitelisted: false }))
+  @Get('/resultados/:id/graficos')
+  async obtenerResultadosGraficosEncuesta(
+    @Param('id') id: number,
+    @CodigoDTODecorator(new ValidationPipe({ transform: true }))
+    { codigo }: CodigoDTO,
+  ): Promise<ResultadosGraficosDto> {
+    return await this.encuestasService.obtenerResultadosGraficoEncuesta(
+      id,
+      codigo,
     );
   }
 
@@ -90,37 +106,29 @@ export class EncuestasController {
     @Res() res: Response,
     @Param('id') id: number,
     @Query() dto: CodigoDTO,
-    // Assuming CSV export should fetch all results, not paginated
-    // If paginated CSV is needed, add page/limit here too
   ) {
-    const encuesta = await this.encuestasService.obtenerResultadosEncuesta(
-      id,
-      dto.codigo,
-    );
+    const encuesta = (
+      await this.encuestasService.obtenerResultadosEncuesta(id, dto.codigo, 0)
+    ).data;
 
     const preguntasMap = new Map<number, string>();
-    if (encuestaResultados && encuestaResultados.preguntas) {
-      for (const p of encuestaResultados.preguntas) {
-        preguntasMap.set(p.id, p.texto);
+    for (const p of encuesta.preguntas) {
+      preguntasMap.set(p.id, p.texto);
+    }
+
+    const filas = encuesta.respuestas.map((respuesta: any, indice: number) => {
+      const fila: any = { id: indice + 1 };
+
+      for (const r of respuesta.respuestas) {
+        const textoPregunta =
+          preguntasMap.get(r.preguntaId) || `Pregunta ${r.preguntaId}`;
+        fila[textoPregunta] = Array.isArray(r.textoRespuesta)
+          ? r.textoRespuesta.join(', ')
+          : r.textoRespuesta;
       }
-    }
 
-    let filas: any[] = []; // Especificamos el tipo explícitamente como any[]
-    if (encuestaResultados && encuestaResultados.respuestas) {
-      filas = encuestaResultados.respuestas.map((respuesta: any, indice: number) => {
-        const fila: any = { id: indice + 1 };
-
-        for (const r of respuesta.respuestas) {
-          const textoPregunta =
-            preguntasMap.get(r.preguntaId) || `Pregunta ${r.preguntaId}`;
-          fila[textoPregunta] = Array.isArray(r.textoRespuesta)
-            ? r.textoRespuesta.join(', ')
-            : r.textoRespuesta;
-        }
-
-        return fila;
-      });
-    }
+      return fila;
+    });
 
     const todosLosCampos = new Set<string>();
     filas.forEach((fila) => {
