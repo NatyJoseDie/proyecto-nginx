@@ -1,4 +1,17 @@
-import { Body, Controller, Get, Res, Post, Param, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Res,
+  Post,
+  Param,
+  Query,
+  ParseIntPipe,
+  DefaultValuePipe,
+  ValidationPipe,
+  UsePipes,
+  Patch,
+} from '@nestjs/common';
 
 import { EncuestasService } from '../services/encuestas.service';
 import { CreateEncuestaDTO } from '../dtos/create-encuesta.dto';
@@ -12,6 +25,9 @@ import { parse } from 'json2csv';
 import { PaginationResult } from '../interfaces/paginationResult'; // Import PaginationResult
 
 import { ApiTags } from '@nestjs/swagger';
+import { PaginationResult } from '../interfaces/paginationResult';
+import { CodigoDTODecorator } from '../decorators/codigoDto';
+import { ResultadosGraficosDto } from '../dtos/resultados.graficos.dto';
 @ApiTags('Encuestas')
 @Controller('encuestas')
 export class EncuestasController {
@@ -31,6 +47,21 @@ export class EncuestasController {
     return await this.encuestasService.crearEncuesta(dto);
   }
 
+  @Patch(':id/estado')
+  async cambiarEstadoEncuesta(
+    @Param('id') id: number,
+    @Query() dto: CodigoDTO,
+    @Body('activa') activa: boolean,
+  ): Promise<{
+    mensaje: string;
+  }> {
+    return await this.encuestasService.cambiarEstadoEncuesta(
+      id,
+      dto.codigo,
+      activa,
+    );
+  }
+
   @Get(':id')
   async obtenerEncuesta(
     @Param('id') id: number,
@@ -42,19 +73,15 @@ export class EncuestasController {
       dto.tipo,
     );
   }
-
+  @UsePipes(new ValidationPipe({ forbidNonWhitelisted: false }))
   @Get('/resultados/:id')
   async obtenerResultadosEncuesta(
     @Param('id') id: number,
     @Query() dto: CodigoDTO,
-    @Query('page') page: number = 1, // Add page query parameter, default to 1
-    @Query('limit') limit: number = 5, // Add limit query parameter, default to 5 (or your preferred default)
-  ): Promise<PaginationResult<ResultadosDto>> { // Update return type
+  ): Promise<ResultadosDto> {
     return await this.encuestasService.obtenerResultadosEncuesta(
       id,
       dto.codigo,
-      page, // Pass page
-      limit, // Pass limit
     );
   }
 
@@ -66,17 +93,10 @@ export class EncuestasController {
     // Assuming CSV export should fetch all results, not paginated
     // If paginated CSV is needed, add page/limit here too
   ) {
-    // For CSV, we might want all data, so call a different service method or fetch all pages.
-    // For simplicity, let's assume we fetch the first page for now, or you adjust the service method.
-    // Ideally, you'd have a separate service method for exporting all results if that's the requirement.
-    const paginatedResultados = await this.encuestasService.obtenerResultadosEncuesta(
+    const encuesta = await this.encuestasService.obtenerResultadosEncuesta(
       id,
       dto.codigo,
-      1, // Default to page 1 for CSV or fetch all
-      0, // A limit of 0 or a very high number could signify 'all' in your service
     );
-
-    const encuestaResultados = paginatedResultados.data; // Access the data from the paginated result
 
     const preguntasMap = new Map<number, string>();
     if (encuestaResultados && encuestaResultados.preguntas) {
