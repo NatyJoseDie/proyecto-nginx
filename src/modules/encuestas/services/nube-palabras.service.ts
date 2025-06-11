@@ -42,8 +42,9 @@ export class NubePalabrasService {
     for (const text of palabrasFiltradas) {
       mapaDeFrecuencia.set(text, (mapaDeFrecuencia.get(text) || 0) + 1);
     }
-    return Array.from(mapaDeFrecuencia.entries())
-      .map(([text, value]) => ({ text, value }))
-      .sort((a, b) => b.value - a.value);
+    return Array.from(mapaDeFrecuencia.entries()).map(([text, weight]) => ({
+      text,
+      weight,
+    }));
   }
 }
