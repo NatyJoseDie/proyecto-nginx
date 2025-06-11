@@ -196,6 +196,43 @@ export class EncuestasService {
 
   /// *** TABLA ***
 
+  async obtenerResultadosEncuestaCSV(
+    id: number,
+    codigo: string,
+  ): Promise<ResultadosDto> {
+    const query = this.encuestasRepository
+      .createQueryBuilder('encuesta')
+      .innerJoinAndSelect('encuesta.preguntas', 'pregunta')
+      .leftJoinAndSelect('pregunta.opciones', 'opcionPregunta')
+
+      .leftJoinAndSelect('encuesta.respuestas', 'respuesta')
+
+      .leftJoinAndSelect('respuesta.respuestasOpciones', 'respuestaOpcion')
+      .leftJoinAndSelect('respuestaOpcion.opcion', 'opcionRespuesta')
+      .leftJoinAndSelect(
+        'opcionRespuesta.pregunta',
+        'preguntaDeOpcionRespuesta',
+      )
+
+      .leftJoinAndSelect('respuesta.respuestasAbiertas', 'respuestaAbierta')
+      .leftJoinAndSelect('respuestaAbierta.pregunta', 'preguntaAbierta')
+
+      .leftJoinAndSelect('respuesta.respuestasVerdaderoFalso', 'respuestaVF')
+      .leftJoinAndSelect('respuestaVF.pregunta', 'preguntaVF')
+
+      .where('encuesta.id = :id', { id });
+
+    query.andWhere('encuesta.codigoResultados= :codigo', { codigo });
+    const encuesta = await query.getOne();
+
+    if (!encuesta) {
+      throw new BadRequestException('Datos de encuesta no válidos');
+    }
+    let resultados = this.mapearResultados(encuesta);
+
+    return resultados;
+  }
+
   async obtenerResultadosEncuesta(
     id: number,
     codigo: string,
