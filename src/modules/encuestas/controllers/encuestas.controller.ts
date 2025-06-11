@@ -72,20 +72,49 @@ export class EncuestasController {
       dto.tipo,
     );
   }
-  @UsePipes(new ValidationPipe({ forbidNonWhitelisted: false }))
-  @Get('/resultados/:id')
-  async obtenerResultadosEncuesta(
+
+  @Get('/resultados/:id/csv')
+  async exportarCSV(
+    @Res() res: Response,
     @Param('id') id: number,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @CodigoDTODecorator(new ValidationPipe({ transform: true }))
-    { codigo }: CodigoDTO,
-  ): Promise<PaginationResult<ResultadosDto>> {
-    return await this.encuestasService.obtenerResultadosEncuesta(
+    @Query() dto: CodigoDTO,
+  ) {
+    const encuesta = await this.encuestasService.obtenerResultadosEncuestaCSV(
       id,
-      codigo,
-      page,
-      4,
+      dto.codigo,
     );
+
+    const preguntasMap = new Map<number, string>();
+    for (const pregunta of encuesta.preguntas) {
+      preguntasMap.set(pregunta.id, pregunta.texto);
+    }
+
+    const registros = encuesta.respuestas.map(
+      (respuesta: any, indice: number) => {
+        const registro: any = { id: indice + 1 };
+
+        for (const res of respuesta.respuestas) {
+          const textoDePregunta =
+            preguntasMap.get(res.preguntaId) || `Pregunta ${res.preguntaId}`;
+          registro[textoDePregunta] = Array.isArray(res.textoRespuesta)
+            ? res.textoRespuesta.join(', ')
+            : res.textoRespuesta;
+        }
+        return registro;
+      },
+    );
+
+    const todosLosCampos = new Set<string>();
+    registros.forEach((fila) => {
+      Object.keys(fila).forEach((k) => todosLosCampos.add(k));
+    });
+
+    const campos = Array.from(todosLosCampos);
+    const csv = parse(registros, { fields: campos });
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=encuestas.csv');
+    res.send(csv);
   }
 
   @UsePipes(new ValidationPipe({ forbidNonWhitelisted: false }))
@@ -101,45 +130,19 @@ export class EncuestasController {
     );
   }
 
-  @Get('/resultados/:id/csv')
-  async exportarCSV(
-    @Res() res: Response,
+  @UsePipes(new ValidationPipe({ forbidNonWhitelisted: false }))
+  @Get('/resultados/:id')
+  async obtenerResultadosEncuesta(
     @Param('id') id: number,
-    @Query() dto: CodigoDTO,
-  ) {
-    const encuesta = (
-      await this.encuestasService.obtenerResultadosEncuesta(id, dto.codigo, 0)
-    ).data;
-
-    const preguntasMap = new Map<number, string>();
-    for (const p of encuesta.preguntas) {
-      preguntasMap.set(p.id, p.texto);
-    }
-
-    const filas = encuesta.respuestas.map((respuesta: any, indice: number) => {
-      const fila: any = { id: indice + 1 };
-
-      for (const r of respuesta.respuestas) {
-        const textoPregunta =
-          preguntasMap.get(r.preguntaId) || `Pregunta ${r.preguntaId}`;
-        fila[textoPregunta] = Array.isArray(r.textoRespuesta)
-          ? r.textoRespuesta.join(', ')
-          : r.textoRespuesta;
-      }
-
-      return fila;
-    });
-
-    const todosLosCampos = new Set<string>();
-    filas.forEach((fila) => {
-      Object.keys(fila).forEach((k) => todosLosCampos.add(k));
-    });
-
-    const campos = Array.from(todosLosCampos);
-    const csv = parse(filas, { fields: campos });
-
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=encuestas.csv');
-    res.send(csv);
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @CodigoDTODecorator(new ValidationPipe({ transform: true }))
+    { codigo }: CodigoDTO,
+  ): Promise<PaginationResult<ResultadosDto>> {
+    return await this.encuestasService.obtenerResultadosEncuesta(
+      id,
+      codigo,
+      page,
+      4,
+    );
   }
 }
