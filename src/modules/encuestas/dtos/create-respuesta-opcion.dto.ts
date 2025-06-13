@@ -8,4 +8,9 @@ export class CreateRespuestaOpcionDTO {
   @ValidateNested()
   @Type(() => IdDTO)
   opcion: IdDTO;
+
+  @ApiProperty({ type: () => IdDTO })
+  @ValidateNested()
+  @Type(() => IdDTO)
+  pregunta: IdDTO;
 }

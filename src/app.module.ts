@@ -9,15 +9,18 @@ import { Opcion } from './modules/encuestas/entities/opcion.entity';
 import { Respuesta } from './modules/encuestas/entities/respuesta.entity';
 import { RespuestaOpcion } from './modules/encuestas/entities/respuesta-opcion.entity';
 import { RespuestaAbierta } from './modules/encuestas/entities/respuesta-abierta.entity';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
 
 @Module({
   imports: [
-    EncuestasModule,
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true,
       ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
+    CloudinaryModule,
+    EncuestasModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -44,5 +47,7 @@ import { RespuestaAbierta } from './modules/encuestas/entities/respuesta-abierta
       }),
     }),
   ],
+  providers: [CloudinaryService],
+  exports: [CloudinaryService],
 })
 export class AppModule {}
