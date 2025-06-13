@@ -9,6 +9,7 @@ import {
 } from 'class-validator';
 import { CreatePreguntaDTO } from './create-pregunta.dto';
 import { Type } from 'class-transformer';
+import { IsOptional } from 'class-validator';
 
 export class CreateEncuestaDTO {
   @ApiProperty()
@@ -23,4 +24,11 @@ export class CreateEncuestaDTO {
   @ValidateNested({ each: true })
   @Type(() => CreatePreguntaDTO)
   preguntas: CreatePreguntaDTO[];
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  multimedia?: string;
+
+
 }
