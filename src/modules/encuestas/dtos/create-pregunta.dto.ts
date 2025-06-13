@@ -34,4 +34,15 @@ export class CreatePreguntaDTO {
   @ValidateNested({ each: true })
   @Type(() => CreateOpcionDTO)
   opciones?: CreateOpcionDTO[];
+
+  @ApiProperty({
+    required: false,
+    description: 'Objeto con url y tipo del archivo multimedia',
+    example: { url: 'https://...', tipo: 'image/png' }
+  })
+  @IsOptional()
+  multimedia?: {
+    url: string;
+    tipo: string;
+  };
 }

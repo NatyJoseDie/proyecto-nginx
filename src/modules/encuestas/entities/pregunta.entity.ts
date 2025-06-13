@@ -41,4 +41,7 @@ export class Pregunta {
     (respuestaAbierta) => respuestaAbierta.pregunta,
   )
   respuestas: RespuestaAbierta[];
+  @Column({ type: 'simple-json', nullable: true })
+  multimedia?: { url: string; tipo: string };
+  
 }
