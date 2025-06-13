@@ -2,19 +2,16 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Param,
-  Delete,
   Patch,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
 } from '@nestjs/common';
-
-import { CreatePreguntaDTO } from '../dtos/create-pregunta.dto';
-
-import { UpdatePreguntaDto } from '../dtos/update-pregunta.dto';
-import { ApiTags } from '@nestjs/swagger';
 import { PreguntasService } from '../services/preguntas.service';
+import { CreatePreguntaDTO } from '../dtos/create-pregunta.dto';
+import { UpdatePreguntaDto } from '../dtos/update-pregunta.dto';
 
-@ApiTags('Preguntas')
 @Controller('preguntas')
 export class PreguntasController {
   constructor(private readonly preguntasService: PreguntasService) {}
@@ -25,7 +22,7 @@ export class PreguntasController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.preguntasService.findOne(id);
   }
 
@@ -36,15 +33,14 @@ export class PreguntasController {
 
   @Patch(':id')
   update(
-    @Param('id') id: number,
-
+    @Param('id', ParseIntPipe) id: number,
     @Body() updatePreguntaDTO: UpdatePreguntaDto,
   ) {
     return this.preguntasService.update(id, updatePreguntaDTO);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.preguntasService.remove(id);
   }
 }

@@ -20,4 +20,14 @@ export class RespuestaOpcion {
   })
   @JoinColumn({ name: 'id_opcion' })
   opcion: Opcion;
+
+  @Expose()
+  get opcionId(): number {
+    return this.opcion?.id;
+  }
+
+  @Expose()
+  get preguntaId(): number {
+    return this.opcion?.pregunta?.id;
+  }
 }
